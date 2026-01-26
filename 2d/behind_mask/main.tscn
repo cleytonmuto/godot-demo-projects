@@ -1,0 +1,109 @@
+[gd_scene load_steps=2 format=3 uid="uid://bmain"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_script"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.08, 0.12, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -150.0
+offset_right = 250.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 48
+text = "BEHIND THE MASK"
+horizontal_alignment = 1
+
+[node name="Tagline" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "A puzzle game where the mask you wear
+changes how the world treats you."
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="MaskInfo" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MaskTitle" type="Label" parent="VBoxContainer/MaskInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 16
+text = "THE MASKS:"
+horizontal_alignment = 1
+
+[node name="Neutral" type="Label" parent="VBoxContainer/MaskInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "NEUTRAL (White) - Enemies chase you"
+horizontal_alignment = 1
+
+[node name="Guard" type="Label" parent="VBoxContainer/MaskInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.6, 1, 1)
+text = "GUARD (Blue) - Enemies ignore you"
+horizontal_alignment = 1
+
+[node name="Ghost" type="Label" parent="VBoxContainer/MaskInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 0.7)
+text = "GHOST (Gray) - Pass through enemies"
+horizontal_alignment = 1
+
+[node name="Spacer2" type="Control" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="StartHint" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 20
+text = "Press SPACE to start"
+horizontal_alignment = 1
+
+[node name="Controls" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "WASD/Arrows to move | SPACE to change mask | R to restart"
+horizontal_alignment = 1
+
+[node name="Credits" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+text = "Global Game Jam 2026 - Theme: Mask"
+horizontal_alignment = 1
