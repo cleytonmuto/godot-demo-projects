@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3 uid="uid://cplate001"]
+
+[ext_resource type="Script" path="res://interactables/PressurePlate.gd" id="1_plate"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plate"]
+size = Vector2(48, 16)
+
+[node name="PressurePlate" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_plate")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Base" type="ColorRect" parent="Visual"]
+offset_left = -28.0
+offset_top = -4.0
+offset_right = 28.0
+offset_bottom = 8.0
+color = Color(0.25, 0.25, 0.3, 1)
+
+[node name="Plate" type="ColorRect" parent="Visual"]
+offset_left = -24.0
+offset_top = -6.0
+offset_right = 24.0
+offset_bottom = 2.0
+color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_plate")

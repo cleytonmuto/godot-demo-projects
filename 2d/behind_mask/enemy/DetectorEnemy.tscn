@@ -1,0 +1,62 @@
+[gd_scene load_steps=2 format=3 uid="uid://cdetector001"]
+
+[ext_resource type="Script" path="res://enemy/DetectorEnemy.gd" id="1_detector"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
+radius = 14.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitarea"]
+radius = 20.0
+
+[node name="DetectorEnemy" type="CharacterBody2D" groups=["enemies"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_detector")
+
+[node name="DetectionCircle" type="Polygon2D" parent="."]
+z_index = -5
+color = Color(0.6, 0.2, 0.8, 0.08)
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Body" type="ColorRect" parent="Visual"]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+color = Color(0.6, 0.2, 0.8, 1)
+
+[node name="Eye" type="ColorRect" parent="Visual"]
+offset_left = -6.0
+offset_top = -8.0
+offset_right = 6.0
+offset_bottom = 2.0
+color = Color(1, 1, 1, 1)
+
+[node name="Pupil" type="ColorRect" parent="Visual"]
+offset_left = -3.0
+offset_top = -6.0
+offset_right = 3.0
+offset_bottom = 0.0
+color = Color(0.1, 0.1, 0.1, 1)
+
+[node name="AlertIndicator" type="Label" parent="."]
+offset_left = -8.0
+offset_top = -40.0
+offset_right = 8.0
+offset_bottom = -20.0
+theme_override_colors/font_color = Color(0.6, 0.2, 0.8, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "!"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_enemy")
+
+[node name="HitArea" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea"]
+shape = SubResource("CircleShape2D_hitarea")

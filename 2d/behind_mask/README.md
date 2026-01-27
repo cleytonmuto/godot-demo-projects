@@ -20,13 +20,13 @@ Navigate through rooms filled with patrolling guards and laser barriers by switc
 
 ## The Masks
 
-| Mask | Color | Effect |
-|------|-------|--------|
-| **Neutral** | White | Default state - enemies will chase you |
-| **Guard** | Blue | Enemies ignore you, lasers deactivate |
-| **Ghost** | Gray (transparent) | Pass through enemies, but they still see you |
-| **Predator** | Red | Enemies flee from you in fear! |
-| **Decoy** | Yellow | When switching away, leaves a decoy that distracts enemies for 3 seconds |
+| Mask | Color | Cooldown | Charges | Effect |
+|------|-------|----------|---------|--------|
+| **Neutral** | White | 0.5s | ∞ | Default state - enemies will chase you |
+| **Guard** | Blue | 2.0s | 5 | Enemies ignore you, lasers deactivate |
+| **Ghost** | Gray | 1.0s | 4 | Pass through enemies, avoid cameras |
+| **Predator** | Red | 2.5s | 3 | Enemies flee from you in fear! |
+| **Decoy** | Yellow | 1.5s | 3 | Leave a decoy that distracts enemies |
 
 ## Gameplay
 
@@ -48,19 +48,42 @@ Navigate through rooms filled with patrolling guards and laser barriers by switc
 
 ## Features
 
-- **Visual Detection Radius**: See the red circle showing each enemy's awareness zone
-- **Alert Indicators**: Enemies show "!" when they spot you, "!!" when fleeing
-- **Mask Icons HUD**: See all 5 masks with the current one highlighted
-- **Cooldown Bar**: Visual indicator of when you can switch masks again
-- **Screen Shake**: Feedback when you die
-- **Laser Barriers**: Environmental hazards that only Guard mask can bypass
-- **Procedural Audio**: All sound effects and music generated in real-time (no external files needed!)
-  - Mask switch whoosh
-  - Death sound
-  - Victory fanfare
-  - Enemy alert/flee sounds
-  - Laser activation sounds
-  - Ambient background music
+### Enemy AI
+- **Visual Detection Radius**: See the colored circle showing each enemy's awareness zone
+- **Alert Indicators**: "!" when spotted, "?" when investigating, "!!" when fleeing
+- **Memory System**: Enemies remember your last position and investigate
+- **Patrol Patterns**: Horizontal, vertical, circular, or random patrol routes
+- **Communication**: Enemies alert nearby allies when they spot you
+
+### Enemy Types
+- **Standard (Red)**: Normal patrol and chase behavior
+- **Detector (Purple)**: Sees through ALL masks except Ghost
+- **Hunter (Green)**: Can detect Guard mask after 2 seconds of close proximity
+- **Mimic (Color-shifting)**: Inverted behavior - chases when you're "safe"
+
+### Environmental Hazards
+- **Static Lasers**: Guard mask deactivates them
+- **Patrolling Lasers**: Moving laser beams, also deactivated by Guard
+- **Security Cameras**: Sweeping cameras that fill your detection meter (Ghost avoids)
+- **Pressure Plates**: Trigger mechanisms (Ghost can't activate - too ethereal)
+- **One-Way Doors**: Commit to your path, no backtracking
+
+### Resource Management
+- **Mask Charges**: Limited uses per mask (shown in HUD)
+- **Per-Mask Cooldowns**: Each mask has different cooldown timing
+- **Detection Meter**: Cameras and prolonged exposure fill the meter - full = forced alert!
+
+### HUD Elements
+- **Mask Icons**: All 5 masks with current highlighted
+- **Charge Counters**: Remaining uses for each mask
+- **Cooldown Bar**: Time until next switch
+- **Detection Meter**: Current alert level
+- **Switch Counter**: Track your efficiency
+
+### Juice
+- **Screen Shake**: Feedback on death
+- **Mask Switch Animation**: Flash and scale pop
+- **Procedural Audio**: All SFX and BGM generated in real-time
 
 ## Project Structure
 

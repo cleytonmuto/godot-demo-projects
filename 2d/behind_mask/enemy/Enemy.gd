@@ -1,18 +1,37 @@
 extends CharacterBody2D
+class_name BaseEnemy
 
 @export var speed := 100.0
 @export var chase_speed := 140.0
 @export var flee_speed := 120.0
 @export var patrol_distance := 64.0
 @export var detection_radius := 180.0
+@export var communication_radius := 250.0
 
-enum State { PATROL, ALERT, CHASE, FLEE }
+## Patrol pattern: 0=horizontal, 1=vertical, 2=circular, 3=random
+@export_enum("Horizontal", "Vertical", "Circular", "Random") var patrol_pattern := 0
+
+enum State { PATROL, ALERT, CHASE, FLEE, INVESTIGATE }
 
 var start_position: Vector2
 var direction := 1
 var current_state := State.PATROL
 var player: CharacterBody2D
 var mask_manager: Node
+
+# Memory system
+var last_seen_position: Vector2 = Vector2.ZERO
+var has_memory := false
+var memory_duration := 5.0
+var memory_timer := 0.0
+
+# Patrol pattern variables
+var patrol_angle := 0.0
+var random_target: Vector2 = Vector2.ZERO
+var random_wait_timer := 0.0
+
+# Communication
+var alerted_by_ally := false
 
 @onready var visual := $Visual
 @onready var detection_circle := $DetectionCircle
@@ -21,8 +40,10 @@ var mask_manager: Node
 
 func _ready() -> void:
 	start_position = global_position
+	random_target = start_position
 	_draw_detection_circle()
 	alert_indicator.visible = false
+	add_to_group("enemies")
 	
 	# Wait a frame to ensure player is ready
 	await get_tree().process_frame
@@ -50,18 +71,34 @@ func _physics_process(delta: float) -> void:
 	if not is_instance_valid(player):
 		return
 	
+	# Update memory timer
+	if has_memory:
+		memory_timer -= delta
+		if memory_timer <= 0:
+			has_memory = false
+	
 	var distance := global_position.distance_to(player.global_position)
 	var in_range := distance < detection_radius
 	
+	# Remember player position when visible
+	if in_range and mask_manager and mask_manager.can_enemy_chase():
+		last_seen_position = player.global_position
+		has_memory = true
+		memory_timer = memory_duration
+	
 	match current_state:
 		State.PATROL:
-			_do_patrol()
+			_do_patrol(delta)
 			_update_detection_visual(false)
 			if in_range:
 				if mask_manager and mask_manager.should_enemy_flee():
 					_enter_flee_state()
 				elif mask_manager and mask_manager.can_enemy_chase():
 					_enter_alert_state()
+					_alert_nearby_enemies()
+			elif alerted_by_ally:
+				alerted_by_ally = false
+				_enter_investigate_state()
 		
 		State.ALERT:
 			velocity = Vector2.ZERO
@@ -74,7 +111,11 @@ func _physics_process(delta: float) -> void:
 				if mask_manager.should_enemy_flee():
 					_enter_flee_state()
 				elif not mask_manager.can_enemy_chase():
-					_enter_patrol_state()
+					# Lost sight - investigate last position
+					if has_memory:
+						_enter_investigate_state()
+					else:
+						_enter_patrol_state()
 		
 		State.FLEE:
 			_do_flee()
@@ -84,6 +125,16 @@ func _physics_process(delta: float) -> void:
 					_enter_alert_state()
 				else:
 					_enter_patrol_state()
+		
+		State.INVESTIGATE:
+			_do_investigate()
+			_update_detection_visual(false)
+			# If player enters range while investigating
+			if in_range:
+				if mask_manager and mask_manager.should_enemy_flee():
+					_enter_flee_state()
+				elif mask_manager and mask_manager.can_enemy_chase():
+					_enter_alert_state()
 	
 	move_and_slide()
 	
@@ -91,11 +142,32 @@ func _physics_process(delta: float) -> void:
 	if velocity.x != 0:
 		visual.scale.x = sign(velocity.x)
 
-func _do_patrol() -> void:
-	velocity.x = direction * speed
-	velocity.y = 0
-	if abs(global_position.x - start_position.x) > patrol_distance:
-		direction *= -1
+func _do_patrol(delta: float) -> void:
+	match patrol_pattern:
+		0:  # Horizontal
+			velocity.x = direction * speed
+			velocity.y = 0
+			if abs(global_position.x - start_position.x) > patrol_distance:
+				direction *= -1
+		1:  # Vertical
+			velocity.x = 0
+			velocity.y = direction * speed
+			if abs(global_position.y - start_position.y) > patrol_distance:
+				direction *= -1
+		2:  # Circular
+			patrol_angle += delta * speed * 0.02
+			var target := start_position + Vector2(cos(patrol_angle), sin(patrol_angle)) * patrol_distance
+			velocity = (target - global_position).normalized() * speed
+		3:  # Random
+			random_wait_timer -= delta
+			if random_wait_timer <= 0 or global_position.distance_to(random_target) < 10:
+				# Pick new random target within patrol area
+				random_target = start_position + Vector2(
+					randf_range(-patrol_distance, patrol_distance),
+					randf_range(-patrol_distance, patrol_distance)
+				)
+				random_wait_timer = randf_range(1.0, 3.0)
+			velocity = (random_target - global_position).normalized() * speed * 0.7
 
 func _do_chase() -> void:
 	var target_pos: Vector2
@@ -112,6 +184,32 @@ func _do_chase() -> void:
 func _do_flee() -> void:
 	var dir := (global_position - player.global_position).normalized()
 	velocity = dir * flee_speed
+
+func _do_investigate() -> void:
+	if not has_memory:
+		_enter_patrol_state()
+		return
+	
+	var dir := (last_seen_position - global_position).normalized()
+	velocity = dir * speed * 0.8
+	
+	# Reached investigation point
+	if global_position.distance_to(last_seen_position) < 20:
+		has_memory = false
+		# Look around briefly then return to patrol
+		alert_indicator.text = "?"
+		await get_tree().create_timer(1.5).timeout
+		if current_state == State.INVESTIGATE:
+			_enter_patrol_state()
+
+func _enter_investigate_state() -> void:
+	if not has_memory:
+		_enter_patrol_state()
+		return
+	current_state = State.INVESTIGATE
+	alert_indicator.visible = true
+	alert_indicator.text = "?"
+	alert_indicator.modulate = Color.ORANGE
 
 func _enter_patrol_state() -> void:
 	current_state = State.PATROL
@@ -181,3 +279,21 @@ func _on_hit_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		if mask_manager and mask_manager.can_collide_with_enemy():
 			body.die()
+
+# Communication system - alert nearby enemies
+func _alert_nearby_enemies() -> void:
+	var enemies := get_tree().get_nodes_in_group("enemies")
+	for enemy in enemies:
+		if enemy == self:
+			continue
+		if enemy is BaseEnemy:
+			var dist := global_position.distance_to(enemy.global_position)
+			if dist < communication_radius:
+				enemy.receive_alert(last_seen_position)
+
+func receive_alert(position: Vector2) -> void:
+	if current_state == State.PATROL:
+		last_seen_position = position
+		has_memory = true
+		memory_timer = memory_duration
+		alerted_by_ally = true

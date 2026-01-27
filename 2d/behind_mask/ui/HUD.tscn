@@ -6,65 +6,117 @@
 script = ExtResource("1_hud")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-anchors_preset = 10
+anchors_preset = 1
+anchor_left = 1.0
 anchor_right = 1.0
-offset_bottom = 120.0
-grow_horizontal = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 16
+offset_left = -280.0
+offset_bottom = 130.0
+grow_horizontal = 0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 4
 
 [node name="MaskIcons" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 4
 
 [node name="Mask0" type="ColorRect" parent="MarginContainer/VBoxContainer/MaskIcons"]
-custom_minimum_size = Vector2(32, 32)
+custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 color = Color(1, 1, 1, 1)
 
 [node name="Mask1" type="ColorRect" parent="MarginContainer/VBoxContainer/MaskIcons"]
-custom_minimum_size = Vector2(32, 32)
+custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 color = Color(0.4, 0.6, 1, 1)
 
 [node name="Mask2" type="ColorRect" parent="MarginContainer/VBoxContainer/MaskIcons"]
-custom_minimum_size = Vector2(32, 32)
+custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 color = Color(0.7, 0.7, 0.7, 0.5)
 
 [node name="Mask3" type="ColorRect" parent="MarginContainer/VBoxContainer/MaskIcons"]
-custom_minimum_size = Vector2(32, 32)
+custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 color = Color(1, 0.3, 0.3, 1)
 
 [node name="Mask4" type="ColorRect" parent="MarginContainer/VBoxContainer/MaskIcons"]
-custom_minimum_size = Vector2(32, 32)
+custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 color = Color(1, 0.9, 0.3, 1)
 
 [node name="CooldownBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/MaskIcons"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(60, 0)
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 size_flags_vertical = 1
 max_value = 1.0
 value = 0.0
 show_percentage = false
 
+[node name="ChargesContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Charge0" type="Label" parent="MarginContainer/VBoxContainer/ChargesContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "∞"
+
+[node name="Charge1" type="Label" parent="MarginContainer/VBoxContainer/ChargesContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "5"
+
+[node name="Charge2" type="Label" parent="MarginContainer/VBoxContainer/ChargesContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "4"
+
+[node name="Charge3" type="Label" parent="MarginContainer/VBoxContainer/ChargesContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "3"
+
+[node name="Charge4" type="Label" parent="MarginContainer/VBoxContainer/ChargesContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "3"
+
+[node name="DetectionRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DetectionLabel" type="Label" parent="MarginContainer/VBoxContainer/DetectionRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 12
+text = "DETECTION:"
+
+[node name="DetectionBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/DetectionRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 12)
+layout_mode = 2
+max_value = 1.0
+value = 0.0
+show_percentage = false
+
+[node name="StatsLabel" type="Label" parent="MarginContainer/VBoxContainer/DetectionRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 12
+text = "Switches: 0"
+
 [node name="HintLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
-text = "Enemies will chase you!"
-
-[node name="ControlsLabel" type="Label" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
-theme_override_font_sizes/font_size = 14
-text = "[WASD/Arrows] Move  |  [Space] Change Mask  |  [R] Restart"
+theme_override_font_sizes/font_size = 11
+text = "Enemies chase you!"

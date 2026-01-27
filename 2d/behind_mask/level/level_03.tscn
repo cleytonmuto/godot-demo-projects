@@ -150,7 +150,7 @@ position = Vector2(352, 640)
 
 [node name="ExitDoor" parent="." instance=ExtResource("3_door")]
 position = Vector2(896, 128)
-next_level_path = "res://ui/win_screen.tscn"
+next_level_path = "res://level/level_04.tscn"
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
 
