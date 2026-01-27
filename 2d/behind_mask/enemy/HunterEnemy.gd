@@ -19,93 +19,106 @@ func _physics_process(delta: float) -> void:
 	if not is_instance_valid(player):
 		return
 	
-	# Update memory timer
-	if has_memory:
-		memory_timer -= delta
-		if memory_timer <= 0:
-			has_memory = false
-	
 	var distance := global_position.distance_to(player.global_position)
-	var in_range := distance < detection_radius
-	var close_range := distance < detection_radius * 0.5  # Within half detection radius
+	var close_range := distance < detection_radius * 0.6
 	
-	# Hunter detection logic
+	# Priority checks
+	var should_flee: bool = mask_manager != null and mask_manager.should_enemy_flee()
+	var is_guard: bool = mask_manager != null and mask_manager.current_mask == mask_manager.Mask.GUARD
+	var is_ghost: bool = mask_manager != null and mask_manager.current_mask == mask_manager.Mask.GHOST
+	
+	# Hunter detection logic for Guard mask
 	var can_chase := false
-	if mask_manager:
-		if mask_manager.should_enemy_flee():
-			can_chase = false  # Still respects Predator
-		elif mask_manager.current_mask == mask_manager.Mask.GUARD:
-			# Slowly detect Guard mask at close range
-			if close_range:
-				guard_exposure_timer += delta
-				is_detecting_guard = true
-				if guard_exposure_timer >= detection_time:
-					can_chase = true
-			else:
-				guard_exposure_timer = maxf(0, guard_exposure_timer - delta * 0.5)
-				is_detecting_guard = guard_exposure_timer > 0
+	if should_flee:
+		can_chase = false
+		guard_exposure_timer = 0
+		is_detecting_guard = false
+	elif is_guard:
+		# Detect Guard mask - faster at close range
+		if close_range:
+			guard_exposure_timer += delta * 1.5
 		else:
-			guard_exposure_timer = 0
-			is_detecting_guard = false
-			can_chase = mask_manager.can_enemy_chase() and in_range
-	
-	# Remember player position when visible
-	if can_chase:
-		last_seen_position = player.global_position
-		has_memory = true
-		memory_timer = memory_duration
+			guard_exposure_timer += delta * 0.3
+		is_detecting_guard = guard_exposure_timer > 0.3
+		can_chase = guard_exposure_timer >= detection_time
+	elif is_ghost:
+		# Ghost mask = can't see at all
+		guard_exposure_timer = 0
+		is_detecting_guard = false
+		can_chase = false
+	else:
+		# Normal masks (Neutral, Decoy)
+		guard_exposure_timer = 0
+		is_detecting_guard = false
+		can_chase = mask_manager and mask_manager.can_enemy_chase()
 	
 	# Update visual indicator for detection progress
-	if is_detecting_guard and current_state == State.PATROL:
+	if is_detecting_guard and not can_chase:
 		alert_indicator.visible = true
 		alert_indicator.text = "..."
 		alert_indicator.modulate = Color.YELLOW.lerp(Color.RED, guard_exposure_timer / detection_time)
 	
+	# If Guard mask and not yet detected, wander while detecting
+	if is_guard and not can_chase:
+		_do_wander(delta)
+		_update_detection_visual(false)
+		move_and_slide()
+		if velocity.x != 0:
+			visual.scale.x = sign(velocity.x)
+		return
+	
+	# If Ghost mask, wander randomly
+	if is_ghost:
+		_do_wander(delta)
+		alert_indicator.visible = false
+		_update_detection_visual(false)
+		current_state = State.PATROL
+		move_and_slide()
+		if velocity.x != 0:
+			visual.scale.x = sign(velocity.x)
+		return
+	
+	# Track player when can chase
+	if can_chase or should_flee:
+		last_seen_position = player.global_position
+		has_memory = true
+		memory_timer = memory_duration
+	
 	match current_state:
 		State.PATROL:
-			_do_patrol(delta)
+			_do_hunt(delta)
 			_update_detection_visual(false)
-			if mask_manager and mask_manager.should_enemy_flee() and in_range:
+			if should_flee:
 				_enter_flee_state()
 			elif can_chase:
-				_enter_alert_state()
-				_alert_nearby_enemies()
-			elif alerted_by_ally:
-				alerted_by_ally = false
-				_enter_investigate_state()
+				_enter_chase_state_fast()
 		
 		State.ALERT:
-			velocity = Vector2.ZERO
+			_do_chase()
 			_update_detection_visual(true)
 		
 		State.CHASE:
 			_do_chase()
 			_update_detection_visual(true)
-			if mask_manager:
-				if mask_manager.should_enemy_flee():
-					_enter_flee_state()
-				elif not can_chase and not (mask_manager.current_mask == mask_manager.Mask.GUARD and close_range):
-					if has_memory:
-						_enter_investigate_state()
-					else:
-						_enter_patrol_state()
+			if should_flee:
+				_enter_flee_state()
 		
 		State.FLEE:
 			_do_flee()
 			_update_detection_visual(false, true)
-			if mask_manager and not mask_manager.should_enemy_flee():
+			if not should_flee:
 				if can_chase:
-					_enter_alert_state()
+					_enter_chase_state_fast()
 				else:
 					_enter_patrol_state()
 		
 		State.INVESTIGATE:
-			_do_investigate()
+			_do_hunt(delta)
 			_update_detection_visual(false)
-			if mask_manager and mask_manager.should_enemy_flee() and in_range:
+			if should_flee:
 				_enter_flee_state()
 			elif can_chase:
-				_enter_alert_state()
+				_enter_chase_state_fast()
 	
 	move_and_slide()
 	

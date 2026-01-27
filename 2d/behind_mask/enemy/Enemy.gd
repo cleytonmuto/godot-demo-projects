@@ -77,64 +77,64 @@ func _physics_process(delta: float) -> void:
 		if memory_timer <= 0:
 			has_memory = false
 	
-	var distance := global_position.distance_to(player.global_position)
-	var in_range := distance < detection_radius
+	# Check mask states - GUARD (blue) is priority ignore, PREDATOR (red) causes flee
+	var should_ignore: bool = mask_manager != null and not mask_manager.can_enemy_chase() and not mask_manager.should_enemy_flee()
+	var should_flee: bool = mask_manager != null and mask_manager.should_enemy_flee()
+	var can_chase: bool = mask_manager != null and mask_manager.can_enemy_chase()
 	
-	# Remember player position when visible
-	if in_range and mask_manager and mask_manager.can_enemy_chase():
+	# Track player position only when not ignoring
+	if not should_ignore:
 		last_seen_position = player.global_position
 		has_memory = true
 		memory_timer = memory_duration
 	
+	# PRIORITY: If player wears Guard mask, wander randomly (ignore player)
+	if should_ignore:
+		_do_wander(delta)
+		_update_detection_visual(false)
+		alert_indicator.visible = false
+		current_state = State.PATROL
+		move_and_slide()
+		if velocity.x != 0:
+			visual.scale.x = sign(velocity.x)
+		return
+	
 	match current_state:
 		State.PATROL:
-			_do_patrol(delta)
+			# Hunt toward player
+			_do_hunt(delta)
 			_update_detection_visual(false)
-			if in_range:
-				if mask_manager and mask_manager.should_enemy_flee():
-					_enter_flee_state()
-				elif mask_manager and mask_manager.can_enemy_chase():
-					_enter_alert_state()
-					_alert_nearby_enemies()
-			elif alerted_by_ally:
-				alerted_by_ally = false
-				_enter_investigate_state()
+			if should_flee:
+				_enter_flee_state()
+			elif can_chase:
+				_enter_chase_state_fast()
 		
 		State.ALERT:
-			velocity = Vector2.ZERO
+			_do_chase()
 			_update_detection_visual(true)
 		
 		State.CHASE:
 			_do_chase()
 			_update_detection_visual(true)
-			if mask_manager:
-				if mask_manager.should_enemy_flee():
-					_enter_flee_state()
-				elif not mask_manager.can_enemy_chase():
-					# Lost sight - investigate last position
-					if has_memory:
-						_enter_investigate_state()
-					else:
-						_enter_patrol_state()
+			if should_flee:
+				_enter_flee_state()
 		
 		State.FLEE:
 			_do_flee()
 			_update_detection_visual(false, true)
-			if mask_manager and not mask_manager.should_enemy_flee():
-				if mask_manager.can_enemy_chase() and in_range:
-					_enter_alert_state()
+			if not should_flee:
+				if can_chase:
+					_enter_chase_state_fast()
 				else:
 					_enter_patrol_state()
 		
 		State.INVESTIGATE:
-			_do_investigate()
+			_do_hunt(delta)
 			_update_detection_visual(false)
-			# If player enters range while investigating
-			if in_range:
-				if mask_manager and mask_manager.should_enemy_flee():
-					_enter_flee_state()
-				elif mask_manager and mask_manager.can_enemy_chase():
-					_enter_alert_state()
+			if should_flee:
+				_enter_flee_state()
+			elif can_chase:
+				_enter_chase_state_fast()
 	
 	move_and_slide()
 	
@@ -143,31 +143,28 @@ func _physics_process(delta: float) -> void:
 		visual.scale.x = sign(velocity.x)
 
 func _do_patrol(delta: float) -> void:
-	match patrol_pattern:
-		0:  # Horizontal
-			velocity.x = direction * speed
-			velocity.y = 0
-			if abs(global_position.x - start_position.x) > patrol_distance:
-				direction *= -1
-		1:  # Vertical
-			velocity.x = 0
-			velocity.y = direction * speed
-			if abs(global_position.y - start_position.y) > patrol_distance:
-				direction *= -1
-		2:  # Circular
-			patrol_angle += delta * speed * 0.02
-			var target := start_position + Vector2(cos(patrol_angle), sin(patrol_angle)) * patrol_distance
-			velocity = (target - global_position).normalized() * speed
-		3:  # Random
-			random_wait_timer -= delta
-			if random_wait_timer <= 0 or global_position.distance_to(random_target) < 10:
-				# Pick new random target within patrol area
-				random_target = start_position + Vector2(
-					randf_range(-patrol_distance, patrol_distance),
-					randf_range(-patrol_distance, patrol_distance)
-				)
-				random_wait_timer = randf_range(1.0, 3.0)
-			velocity = (random_target - global_position).normalized() * speed * 0.7
+	# Random wandering when not chasing
+	_do_wander(delta)
+
+func _do_wander(delta: float) -> void:
+	# Move randomly around the area
+	random_wait_timer -= delta
+	if random_wait_timer <= 0 or global_position.distance_to(random_target) < 15:
+		# Pick new random target
+		random_target = start_position + Vector2(
+			randf_range(-patrol_distance * 2, patrol_distance * 2),
+			randf_range(-patrol_distance * 2, patrol_distance * 2)
+		)
+		random_wait_timer = randf_range(1.5, 3.0)
+	velocity = (random_target - global_position).normalized() * speed * 0.6
+
+func _do_hunt(_delta: float) -> void:
+	# Move toward player at patrol speed
+	if not is_instance_valid(player):
+		velocity = Vector2.ZERO
+		return
+	var dir := (player.global_position - global_position).normalized()
+	velocity = dir * speed
 
 func _do_chase() -> void:
 	var target_pos: Vector2
@@ -216,26 +213,17 @@ func _enter_patrol_state() -> void:
 	alert_indicator.visible = false
 
 func _enter_alert_state() -> void:
-	current_state = State.ALERT
+	# Redirect to fast chase
+	_enter_chase_state_fast()
+
+func _enter_chase_state_fast() -> void:
+	current_state = State.CHASE
 	alert_indicator.visible = true
 	alert_indicator.text = "!"
 	alert_indicator.modulate = Color.RED
 	
-	# Play alert sound
+	# Play alert sound (only if not already chasing)
 	AudioManager.play_enemy_alert()
-	
-	# Brief pause before chasing
-	var alert_tween := create_tween()
-	alert_tween.tween_property(alert_indicator, "scale", Vector2(1.5, 1.5), 0.15)
-	alert_tween.tween_property(alert_indicator, "scale", Vector2.ONE, 0.15)
-	
-	await get_tree().create_timer(0.4).timeout
-	
-	# Check if we should still chase after the pause
-	if mask_manager and mask_manager.can_enemy_chase() and not mask_manager.should_enemy_flee():
-		current_state = State.CHASE
-	else:
-		_enter_patrol_state()
 
 func _enter_flee_state() -> void:
 	current_state = State.FLEE
@@ -261,19 +249,18 @@ func _on_mask_changed(_mask: int) -> void:
 	if not mask_manager:
 		return
 	
-	var distance := global_position.distance_to(player.global_position)
-	var in_range := distance < detection_radius
+	# PRIORITY: Guard mask (blue) = wander randomly, ignore player
+	if not mask_manager.can_enemy_chase() and not mask_manager.should_enemy_flee():
+		alert_indicator.visible = false
+		current_state = State.PATROL
+		# Reset random target to start wandering
+		random_wait_timer = 0
+		return
 	
 	if mask_manager.should_enemy_flee():
-		if current_state != State.FLEE:
-			_enter_flee_state()
+		_enter_flee_state()
 	elif mask_manager.can_enemy_chase():
-		if current_state == State.FLEE or current_state == State.PATROL:
-			if in_range:
-				_enter_alert_state()
-	else:
-		# Can't chase anymore (Guard mask)
-		_enter_patrol_state()
+		_enter_chase_state_fast()
 
 func _on_hit_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
