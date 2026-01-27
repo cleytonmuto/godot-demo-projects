@@ -42,14 +42,15 @@ func _connect_to_player() -> void:
 		mask_manager.charges_changed.connect(_on_charges_changed)
 		_on_mask_changed(mask_manager.current_mask)
 		_update_all_charges()
-		cooldown_bar.max_value = mask_manager.get_cooldown_time()
+		cooldown_bar.max_value = 3.0  # 3 seconds per mask
 
 func _on_mask_changed(mask: int) -> void:
 	if not mask_manager:
 		return
 	
 	hint_label.text = mask_manager.get_mask_hint()
-	cooldown_bar.max_value = mask_manager.get_cooldown_time()
+	cooldown_bar.max_value = 3.0  # 3 seconds per mask
+	cooldown_bar.value = 3.0  # Reset to full when mask changes
 	
 	# Update stats
 	stats_label.text = "Switches: %d" % mask_manager.total_mask_switches
@@ -77,10 +78,13 @@ func _animate_icon_select(icon: ColorRect, selected: bool) -> void:
 func _on_cooldown_changed(remaining: float) -> void:
 	cooldown_bar.value = remaining
 	
-	if remaining > 0:
-		cooldown_bar.modulate = Color(1, 0.5, 0.5)
+	# Color based on time remaining (more urgent as time runs out)
+	if remaining < 0.5:
+		cooldown_bar.modulate = Color(1, 0.3, 0.3)  # Red - about to change
+	elif remaining < 1.0:
+		cooldown_bar.modulate = Color(1, 0.7, 0.3)  # Orange
 	else:
-		cooldown_bar.modulate = Color(0.5, 1, 0.5)
+		cooldown_bar.modulate = Color(0.3, 0.7, 1)  # Blue - plenty of time
 
 func _on_detection_changed(level: float) -> void:
 	detection_bar.value = level

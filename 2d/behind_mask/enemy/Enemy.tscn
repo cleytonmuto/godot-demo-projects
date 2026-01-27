@@ -19,26 +19,96 @@ color = Color(1, 0.3, 0.3, 0.08)
 
 [node name="Visual" type="Node2D" parent="."]
 
+[node name="BodyShadow" type="ColorRect" parent="Visual"]
+offset_left = -16.0
+offset_top = -12.0
+offset_right = 16.0
+offset_bottom = 16.0
+color = Color(0.6, 0.1, 0.1, 1)
+
 [node name="Body" type="ColorRect" parent="Visual"]
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 14.0
+color = Color(1, 0.3, 0.3, 1)
+
+[node name="BodyDetail" type="ColorRect" parent="Visual"]
 offset_left = -14.0
 offset_top = -14.0
 offset_right = 14.0
-offset_bottom = 14.0
-color = Color(1, 0.3, 0.3, 1)
+offset_bottom = 12.0
+color = Color(1, 0.4, 0.4, 1)
+
+[node name="Chest" type="ColorRect" parent="Visual"]
+offset_left = -10.0
+offset_top = -8.0
+offset_right = 10.0
+offset_bottom = 8.0
+color = Color(0.9, 0.25, 0.25, 1)
+
+[node name="ShoulderLeft" type="ColorRect" parent="Visual"]
+offset_left = -18.0
+offset_top = -12.0
+offset_right = -14.0
+offset_bottom = -4.0
+color = Color(0.8, 0.2, 0.2, 1)
+
+[node name="ShoulderRight" type="ColorRect" parent="Visual"]
+offset_left = 14.0
+offset_top = -12.0
+offset_right = 18.0
+offset_bottom = -4.0
+color = Color(0.8, 0.2, 0.2, 1)
+
+[node name="Eye1Outer" type="ColorRect" parent="Visual"]
+offset_left = -12.0
+offset_top = -10.0
+offset_right = -4.0
+offset_bottom = -2.0
+color = Color(0.05, 0.05, 0.05, 1)
+
+[node name="Eye2Outer" type="ColorRect" parent="Visual"]
+offset_left = 4.0
+offset_top = -10.0
+offset_right = 12.0
+offset_bottom = -2.0
+color = Color(0.05, 0.05, 0.05, 1)
 
 [node name="Eye1" type="ColorRect" parent="Visual"]
 offset_left = -10.0
 offset_top = -8.0
-offset_right = -4.0
-offset_bottom = -2.0
-color = Color(0.1, 0.1, 0.1, 1)
+offset_right = -6.0
+offset_bottom = -4.0
+color = Color(0.9, 0.9, 0.1, 1)
 
 [node name="Eye2" type="ColorRect" parent="Visual"]
-offset_left = 4.0
+offset_left = 6.0
 offset_top = -8.0
 offset_right = 10.0
-offset_bottom = -2.0
-color = Color(0.1, 0.1, 0.1, 1)
+offset_bottom = -4.0
+color = Color(0.9, 0.9, 0.1, 1)
+
+[node name="EyeHighlight" type="ColorRect" parent="Visual"]
+offset_left = -9.0
+offset_top = -7.0
+offset_right = -7.0
+offset_bottom = -5.0
+color = Color(1, 1, 1, 0.9)
+
+[node name="EyeHighlight2" type="ColorRect" parent="Visual"]
+offset_left = 7.0
+offset_top = -7.0
+offset_right = 9.0
+offset_bottom = -5.0
+color = Color(1, 1, 1, 0.9)
+
+[node name="Mouth" type="ColorRect" parent="Visual"]
+offset_left = -4.0
+offset_top = 4.0
+offset_right = 4.0
+offset_bottom = 8.0
+color = Color(0.2, 0.1, 0.1, 1)
 
 [node name="AlertIndicator" type="Label" parent="."]
 offset_left = -8.0

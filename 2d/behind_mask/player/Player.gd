@@ -9,17 +9,14 @@ extends CharacterBody2D
 @onready var mask_chin := $Visual/MaskChin
 @onready var brow := $Visual/Brow
 @onready var nose_bridge := $Visual/NoseBridge
+@onready var mask_base_shadow := $Visual/MaskBaseShadow
+@onready var mask_top_shadow := $Visual/MaskTopShadow
 
-var mask_input_buffer := false
 var is_animating := false
 
 func _ready() -> void:
 	mask_manager.mask_changed.connect(_on_mask_changed)
 	_apply_mask_color(mask_manager.get_mask_color())
-
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("action"):
-		mask_input_buffer = true
 
 func _physics_process(_delta: float) -> void:
 	var input_vector := Vector2(
@@ -29,11 +26,6 @@ func _physics_process(_delta: float) -> void:
 	
 	velocity = input_vector.normalized() * speed
 	move_and_slide()
-	
-	if mask_input_buffer:
-		mask_input_buffer = false
-		if mask_manager.can_switch():
-			mask_manager.cycle_mask()
 	
 	if Input.is_action_just_pressed("restart"):
 		die()
@@ -65,6 +57,12 @@ func _apply_mask_color(color: Color) -> void:
 	mask_base.color = color
 	mask_top.color = color
 	mask_chin.color = color
+	# Shadows use darker version
+	var shadow_color := color.darkened(0.15)
+	if mask_base_shadow:
+		mask_base_shadow.color = shadow_color
+	if mask_top_shadow:
+		mask_top_shadow.color = shadow_color
 	# Slightly darker shade for details
 	var detail_color := color.darkened(0.1)
 	brow.color = detail_color

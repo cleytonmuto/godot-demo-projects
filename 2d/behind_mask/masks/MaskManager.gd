@@ -82,22 +82,76 @@ var is_being_detected := false
 # Stats tracking
 var total_mask_switches := 0
 
+# Automatic mask rotation
+var mask_timer: Timer
+const MASK_DURATION := 3.0  # Each mask lasts 3 seconds
+
 func _ready() -> void:
 	_reset_charges()
+	_setup_auto_rotation()
 
 func _reset_charges() -> void:
 	for mask in Mask.values():
 		mask_charges[mask] = MASK_MAX_CHARGES.get(mask, -1)
 
+func _setup_auto_rotation() -> void:
+	mask_timer = Timer.new()
+	mask_timer.wait_time = MASK_DURATION
+	mask_timer.one_shot = false
+	mask_timer.autostart = false
+	mask_timer.timeout.connect(_auto_cycle_mask)
+	add_child(mask_timer)
+	# Start the timer - first mask change after 3 seconds
+	mask_timer.start()
+
+func _auto_cycle_mask() -> void:
+	# Automatic rotation - skip cooldown and charge checks
+	var previous_mask := current_mask
+	var next_mask := ((current_mask as int) + 1) % Mask.size() as Mask
+	
+	current_mask = next_mask
+	
+	# Use a charge (if not unlimited)
+	var charges: int = mask_charges.get(current_mask, -1)
+	if charges > 0:
+		mask_charges[current_mask] = charges - 1
+		charges_changed.emit(current_mask, mask_charges[current_mask])
+	
+	# Set cooldown based on the mask we switched TO (for display purposes)
+	current_cooldown = MASK_COOLDOWNS.get(current_mask, 1.0)
+	
+	# Track stats
+	total_mask_switches += 1
+	
+	# Play mask switch sound
+	AudioManager.play_mask_switch()
+	
+	# Make noise (enemies nearby may hear)
+	var noise_radius: float = MASK_NOISE_RADIUS.get(current_mask, 0.0)
+	if noise_radius > 0:
+		noise_made.emit(get_parent().global_position, noise_radius)
+	
+	# If switching FROM decoy mask, record position for enemies to chase
+	if previous_mask == Mask.DECOY:
+		decoy_position = get_parent().global_position
+		has_active_decoy = true
+		get_tree().create_timer(3.0).timeout.connect(_clear_decoy)
+	
+	mask_changed.emit(current_mask)
+
 func _process(delta: float) -> void:
-	# Cooldown timer
+	# Cooldown timer (for display purposes only now)
 	if current_cooldown > 0:
 		current_cooldown -= delta
 		cooldown_changed.emit(current_cooldown)
 		if current_cooldown <= 0:
 			current_cooldown = 0
 			cooldown_changed.emit(0)
-			AudioManager.play_cooldown_ready()
+	
+	# Emit remaining time until next mask change
+	if mask_timer:
+		var time_remaining := mask_timer.time_left
+		cooldown_changed.emit(time_remaining)
 	
 	# Detection meter decay
 	if not is_being_detected and detection_level > 0:
@@ -120,53 +174,9 @@ func add_detection(amount: float) -> void:
 	is_being_detected = false
 
 func cycle_mask() -> void:
-	if current_cooldown > 0:
-		return  # Can't switch yet
-	
-	var previous_mask := current_mask
-	var next_mask := ((current_mask as int) + 1) % Mask.size() as Mask
-	
-	# Skip masks with no charges remaining
-	var attempts := 0
-	while attempts < Mask.size():
-		var charges: int = mask_charges.get(next_mask, -1)
-		if charges == -1 or charges > 0:
-			break
-		next_mask = ((next_mask as int) + 1) % Mask.size() as Mask
-		attempts += 1
-	
-	if attempts >= Mask.size():
-		return  # No masks available!
-	
-	current_mask = next_mask
-	
-	# Use a charge (if not unlimited)
-	var charges: int = mask_charges.get(current_mask, -1)
-	if charges > 0:
-		mask_charges[current_mask] = charges - 1
-		charges_changed.emit(current_mask, mask_charges[current_mask])
-	
-	# Set cooldown based on the mask we switched TO
-	current_cooldown = MASK_COOLDOWNS.get(current_mask, 1.0)
-	
-	# Track stats
-	total_mask_switches += 1
-	
-	# Play mask switch sound
-	AudioManager.play_mask_switch()
-	
-	# Make noise (enemies nearby may hear)
-	var noise_radius: float = MASK_NOISE_RADIUS.get(current_mask, 0.0)
-	if noise_radius > 0:
-		noise_made.emit(get_parent().global_position, noise_radius)
-	
-	# If switching FROM decoy mask, record position for enemies to chase
-	if previous_mask == Mask.DECOY:
-		decoy_position = get_parent().global_position
-		has_active_decoy = true
-		get_tree().create_timer(3.0).timeout.connect(_clear_decoy)
-	
-	mask_changed.emit(current_mask)
+	# Manual mask switching is disabled - masks rotate automatically
+	# This function is kept for compatibility but does nothing
+	pass
 
 func _clear_decoy() -> void:
 	has_active_decoy = false

@@ -13,68 +13,159 @@ script = ExtResource("1_player")
 
 [node name="Visual" type="Node2D" parent="."]
 
-[node name="MaskBase" type="ColorRect" parent="Visual"]
+[node name="Body" type="ColorRect" parent="Visual"]
+offset_left = -20.0
+offset_top = 4.0
+offset_right = 20.0
+offset_bottom = 24.0
+color = Color(0.2, 0.15, 0.3, 1)
+
+[node name="BodyDetail" type="ColorRect" parent="Visual"]
 offset_left = -18.0
-offset_top = -20.0
+offset_top = 6.0
 offset_right = 18.0
-offset_bottom = 16.0
+offset_bottom = 22.0
+color = Color(0.3, 0.2, 0.4, 1)
+
+[node name="Chest" type="ColorRect" parent="Visual"]
+offset_left = -12.0
+offset_top = 8.0
+offset_right = 12.0
+offset_bottom = 18.0
+color = Color(0.25, 0.18, 0.35, 1)
+
+[node name="MaskBase" type="ColorRect" parent="Visual"]
+offset_left = -20.0
+offset_top = -24.0
+offset_right = 20.0
+offset_bottom = 4.0
 color = Color(1, 1, 1, 1)
+
+[node name="MaskBaseShadow" type="ColorRect" parent="Visual"]
+offset_left = -18.0
+offset_top = -22.0
+offset_right = 18.0
+offset_bottom = 2.0
+color = Color(0.9, 0.9, 0.9, 1)
 
 [node name="MaskTop" type="ColorRect" parent="Visual"]
-offset_left = -14.0
-offset_top = -24.0
-offset_right = 14.0
-offset_bottom = -18.0
+offset_left = -16.0
+offset_top = -28.0
+offset_right = 16.0
+offset_bottom = -22.0
 color = Color(1, 1, 1, 1)
+
+[node name="MaskTopShadow" type="ColorRect" parent="Visual"]
+offset_left = -14.0
+offset_top = -26.0
+offset_right = 14.0
+offset_bottom = -24.0
+color = Color(0.85, 0.85, 0.85, 1)
 
 [node name="MaskChin" type="ColorRect" parent="Visual"]
-offset_left = -10.0
-offset_top = 14.0
-offset_right = 10.0
-offset_bottom = 20.0
+offset_left = -12.0
+offset_top = 2.0
+offset_right = 12.0
+offset_bottom = 6.0
 color = Color(1, 1, 1, 1)
 
+[node name="MaskOutline" type="ColorRect" parent="Visual"]
+offset_left = -20.0
+offset_top = -28.0
+offset_right = -18.0
+offset_bottom = 4.0
+color = Color(0.7, 0.7, 0.7, 1)
+
+[node name="MaskOutline2" type="ColorRect" parent="Visual"]
+offset_left = 18.0
+offset_top = -28.0
+offset_right = 20.0
+offset_bottom = 4.0
+color = Color(0.7, 0.7, 0.7, 1)
+
 [node name="EyeLeftOuter" type="ColorRect" parent="Visual"]
-offset_left = -14.0
-offset_top = -12.0
-offset_right = -4.0
-offset_bottom = 0.0
-color = Color(0.1, 0.1, 0.1, 1)
+offset_left = -16.0
+offset_top = -16.0
+offset_right = -6.0
+offset_bottom = -4.0
+color = Color(0.05, 0.05, 0.05, 1)
 
 [node name="EyeRightOuter" type="ColorRect" parent="Visual"]
-offset_left = 4.0
-offset_top = -12.0
-offset_right = 14.0
-offset_bottom = 0.0
-color = Color(0.1, 0.1, 0.1, 1)
+offset_left = 6.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = -4.0
+color = Color(0.05, 0.05, 0.05, 1)
 
 [node name="EyeLeftInner" type="ColorRect" parent="Visual"]
-offset_left = -12.0
-offset_top = -10.0
-offset_right = -6.0
-offset_bottom = -2.0
-color = Color(0.3, 0.3, 0.5, 1)
+offset_left = -14.0
+offset_top = -14.0
+offset_right = -8.0
+offset_bottom = -6.0
+color = Color(0.4, 0.5, 0.8, 1)
 
 [node name="EyeRightInner" type="ColorRect" parent="Visual"]
-offset_left = 6.0
-offset_top = -10.0
+offset_left = 8.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = -6.0
+color = Color(0.4, 0.5, 0.8, 1)
+
+[node name="EyeHighlight" type="ColorRect" parent="Visual"]
+offset_left = -12.0
+offset_top = -12.0
+offset_right = -10.0
+offset_bottom = -10.0
+color = Color(1, 1, 1, 0.9)
+
+[node name="EyeHighlight2" type="ColorRect" parent="Visual"]
+offset_left = 10.0
+offset_top = -12.0
 offset_right = 12.0
-offset_bottom = -2.0
-color = Color(0.3, 0.3, 0.5, 1)
+offset_bottom = -10.0
+color = Color(1, 1, 1, 0.9)
 
 [node name="NoseBridge" type="ColorRect" parent="Visual"]
+offset_left = -3.0
+offset_top = -6.0
+offset_right = 3.0
+offset_bottom = 2.0
+color = Color(0.8, 0.8, 0.8, 1)
+
+[node name="NoseShadow" type="ColorRect" parent="Visual"]
 offset_left = -2.0
 offset_top = -4.0
 offset_right = 2.0
-offset_bottom = 8.0
-color = Color(0.85, 0.85, 0.85, 1)
+offset_bottom = 0.0
+color = Color(0.7, 0.7, 0.7, 1)
 
 [node name="Brow" type="ColorRect" parent="Visual"]
+offset_left = -18.0
+offset_top = -20.0
+offset_right = 18.0
+offset_bottom = -18.0
+color = Color(0.85, 0.85, 0.85, 1)
+
+[node name="BrowShadow" type="ColorRect" parent="Visual"]
 offset_left = -16.0
-offset_top = -16.0
+offset_top = -18.0
 offset_right = 16.0
-offset_bottom = -12.0
-color = Color(0.9, 0.9, 0.9, 1)
+offset_bottom = -16.0
+color = Color(0.75, 0.75, 0.75, 1)
+
+[node name="ShoulderLeft" type="ColorRect" parent="Visual"]
+offset_left = -22.0
+offset_top = 6.0
+offset_right = -18.0
+offset_bottom = 12.0
+color = Color(0.15, 0.1, 0.25, 1)
+
+[node name="ShoulderRight" type="ColorRect" parent="Visual"]
+offset_left = 18.0
+offset_top = 6.0
+offset_right = 22.0
+offset_bottom = 12.0
+color = Color(0.15, 0.1, 0.25, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_player")

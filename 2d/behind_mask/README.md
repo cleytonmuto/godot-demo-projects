@@ -15,8 +15,9 @@ Navigate through rooms filled with patrolling guards and laser barriers by switc
 | Key | Action |
 |-----|--------|
 | WASD / Arrow Keys | Move |
-| Space | Change Mask (1 second cooldown) |
 | R | Restart Level |
+
+**Note**: Masks automatically rotate every 3 seconds. Plan your movement accordingly!
 
 ## The Masks
 
@@ -34,9 +35,9 @@ Navigate through rooms filled with patrolling guards and laser barriers by switc
 2. Reach the green exit door on the other side
 3. Avoid or bypass the red patrolling enemies
 4. Navigate through laser barriers
-5. Switch masks strategically to overcome obstacles
+5. Masks automatically rotate every 3 seconds - time your movement!
 6. If an enemy touches you (unless you're a Ghost), you restart the level
-7. Mask switching has a 1-second cooldown - plan ahead!
+7. Watch the cooldown bar to see when the next mask will activate
 
 ## Tips
 
@@ -69,8 +70,8 @@ Navigate through rooms filled with patrolling guards and laser barriers by switc
 - **One-Way Doors**: Commit to your path, no backtracking
 
 ### Resource Management
+- **Automatic Rotation**: Masks change every 3 seconds automatically
 - **Mask Charges**: Limited uses per mask (shown in HUD)
-- **Per-Mask Cooldowns**: Each mask has different cooldown timing
 - **Detection Meter**: Cameras and prolonged exposure fill the meter - full = forced alert!
 
 ### HUD Elements
