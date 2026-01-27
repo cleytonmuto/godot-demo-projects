@@ -5,10 +5,17 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
 radius = 14.0
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitarea"]
+radius = 20.0
+
 [node name="Enemy" type="CharacterBody2D"]
 collision_layer = 4
 collision_mask = 1
 script = ExtResource("1_enemy")
+
+[node name="DetectionCircle" type="Polygon2D" parent="."]
+z_index = -5
+color = Color(1, 0.3, 0.3, 0.08)
 
 [node name="Visual" type="Node2D" parent="."]
 
@@ -33,5 +40,23 @@ offset_right = 10.0
 offset_bottom = -2.0
 color = Color(0.1, 0.1, 0.1, 1)
 
+[node name="AlertIndicator" type="Label" parent="."]
+offset_left = -8.0
+offset_top = -40.0
+offset_right = 8.0
+offset_bottom = -20.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "!"
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_enemy")
+
+[node name="HitArea" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitArea"]
+shape = SubResource("CircleShape2D_hitarea")

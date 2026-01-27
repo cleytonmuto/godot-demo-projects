@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://blevel03"]
+[gd_scene load_steps=9 format=3 uid="uid://blevel03"]
 
 [ext_resource type="PackedScene" uid="uid://bplayer001" path="res://player/Player.tscn" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://benemy001" path="res://enemy/Enemy.tscn" id="2_enemy"]
 [ext_resource type="PackedScene" uid="uid://bdoor001" path="res://interactables/ExitDoor.tscn" id="3_door"]
 [ext_resource type="PackedScene" uid="uid://bhud001" path="res://ui/HUD.tscn" id="4_hud"]
+[ext_resource type="PackedScene" uid="uid://claser001" path="res://interactables/LaserBarrier.tscn" id="5_laser"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(1024, 16)
@@ -18,14 +19,14 @@ size = Vector2(320, 16)
 
 [node name="LevelTitle" type="Label" parent="."]
 offset_left = 64.0
-offset_top = 320.0
-offset_right = 288.0
-offset_bottom = 448.0
+offset_top = 540.0
+offset_right = 320.0
+offset_bottom = 640.0
 theme_override_colors/font_color = Color(0.3, 0.3, 0.3, 1)
-theme_override_font_sizes/font_size = 18
-horizontal_alignment = 1
-text = "Level 3
-The final challenge!"
+theme_override_font_sizes/font_size = 16
+text = "Level 3 - The Gauntlet
+Use Decoy mask to leave a distraction!
+Switch away from Decoy to lure enemies."
 
 [node name="Walls" type="Node2D" parent="."]
 
@@ -133,6 +134,19 @@ patrol_distance = 128.0
 [node name="Enemy3" parent="." instance=ExtResource("2_enemy")]
 position = Vector2(768, 640)
 patrol_distance = 128.0
+
+[node name="Enemy4" parent="." instance=ExtResource("2_enemy")]
+position = Vector2(280, 384)
+patrol_distance = 64.0
+
+[node name="LaserBarrier1" parent="." instance=ExtResource("5_laser")]
+position = Vector2(352, 160)
+
+[node name="LaserBarrier2" parent="." instance=ExtResource("5_laser")]
+position = Vector2(672, 384)
+
+[node name="LaserBarrier3" parent="." instance=ExtResource("5_laser")]
+position = Vector2(352, 640)
 
 [node name="ExitDoor" parent="." instance=ExtResource("3_door")]
 position = Vector2(896, 128)
