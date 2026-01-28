@@ -9,11 +9,14 @@ extends CanvasLayer
 @onready var health_bar: ProgressBar = %HealthBar
 @onready var score_label: Label = %ScoreLabel
 @onready var combo_label: Label = %ComboLabel
+@onready var boss_health_bar: ProgressBar = %BossHealthBar
+@onready var boss_health_label: Label = %BossHealthLabel
 
 var player: Node
 var mask_manager: Node
 var mask_icon_nodes: Array[ColorRect] = []
 var charge_labels: Array[Label] = []
+var boss: Node = null
 
 func _ready() -> void:
 	# Wait a frame for player to be ready
@@ -59,6 +62,19 @@ func _connect_to_player() -> void:
 		ScoreManager.combo_changed.connect(_on_combo_changed)
 		_on_score_changed(ScoreManager.score)
 		_on_combo_changed(ScoreManager.combo)
+	
+	# Connect to boss if present (e.g. Level 4)
+	var boss_node := get_tree().get_first_node_in_group("bosses")
+	if boss_node:
+		boss = boss_node
+		if boss.has_signal("boss_health_changed"):
+			boss.boss_health_changed.connect(_on_boss_health_changed)
+			# Initialize boss health bar using exported boss_health
+			if boss_health_bar:
+				boss_health_bar.visible = true
+				boss_health_bar.max_value = boss.boss_health
+				boss_health_bar.value = boss.boss_health
+				boss_health_label.visible = true
 
 func _on_mask_changed(mask: int) -> void:
 	if not mask_manager:
@@ -148,6 +164,27 @@ func _on_health_changed(current: int, max_health: int) -> void:
 		health_bar.modulate = Color(1, 0.7, 0.2)  # Orange
 	else:
 		health_bar.modulate = Color(0.2, 0.8, 0.2)  # Green
+
+func _on_boss_health_changed(current: int, max_health: int) -> void:
+	if not boss_health_bar:
+		return
+	
+	boss_health_bar.visible = true
+	boss_health_bar.max_value = max_health
+	boss_health_bar.value = current
+	
+	# Color based on boss health level
+	if current <= max_health * 0.3:
+		boss_health_bar.modulate = Color(1, 0.2, 0.2)  # Red - near death
+	elif current <= max_health * 0.6:
+		boss_health_bar.modulate = Color(1, 0.7, 0.2)  # Orange
+	else:
+		boss_health_bar.modulate = Color(0.9, 0.3, 1.0)  # Purple
+	
+	# Hide bar when boss is dead
+	if current <= 0:
+		boss_health_bar.visible = false
+		boss_health_label.visible = false
 
 func _on_score_changed(new_score: int) -> void:
 	if score_label:

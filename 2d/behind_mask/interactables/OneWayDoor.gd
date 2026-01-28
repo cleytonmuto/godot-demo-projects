@@ -55,11 +55,11 @@ func _update_visual() -> void:
 	
 	# Add arrow child if not exists
 	if not has_node("Arrow"):
-		var arrow := Label.new()
-		arrow.name = "Arrow"
-		arrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		add_child(arrow)
+		var new_arrow := Label.new()
+		new_arrow.name = "Arrow"
+		new_arrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		new_arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		add_child(new_arrow)
 	
 	var arrow: Label = $Arrow
 	arrow.add_theme_font_size_override("font_size", 24)
@@ -109,12 +109,12 @@ func _physics_process(_delta: float) -> void:
 		var player: Node2D = get_tree().get_first_node_in_group("player") as Node2D
 		if player:
 			var relative_pos: Vector2 = player.global_position - global_position
-			var current_side := 0
+			var _current_side := 0
 			match passable_from:
 				0, 1:
-					current_side = 0 if relative_pos.x < 0 else 1
+					_current_side = 0 if relative_pos.x < 0 else 1
 				2, 3:
-					current_side = 2 if relative_pos.y < 0 else 3
+					_current_side = 2 if relative_pos.y < 0 else 3
 			
 			# Only allow passage if came from correct side
 			if player_entry_side == passable_from:

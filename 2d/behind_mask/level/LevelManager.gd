@@ -15,6 +15,12 @@ func _ready() -> void:
 		enemy_scene = preload("res://enemy/Enemy.tscn")
 
 func spawn_enemies(position: Vector2, count: int) -> void:
+	# IMPORTANT: This can be called from within physics/collision callbacks.
+	# To avoid "Can't change this state while flushing queries" errors,
+	# defer the actual spawning work to the next frame.
+	call_deferred("_do_spawn_enemies", position, count)
+
+func _do_spawn_enemies(position: Vector2, count: int) -> void:
 	var player := get_tree().get_first_node_in_group("player")
 	if not player:
 		return
@@ -40,7 +46,7 @@ func spawn_enemies(position: Vector2, count: int) -> void:
 		if spawn_pos == Vector2.ZERO:
 			continue
 		
-		# Spawn enemy
+		# Spawn enemy (deferred: we are already outside the flush)
 		var enemy := enemy_scene.instantiate()
 		if not enemy:
 			continue

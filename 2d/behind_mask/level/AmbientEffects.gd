@@ -7,7 +7,8 @@ class_name AmbientEffects
 @export var debris_count := 15
 
 var dust_particles: Array[CPUParticles2D] = []
-var debris_nodes: Array[Node2D] = []
+# Use a generic array because debris are ColorRect (Controls), not Node2D
+var debris_nodes: Array = []
 
 func _ready() -> void:
 	_create_dust_effects()

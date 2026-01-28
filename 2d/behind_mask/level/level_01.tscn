@@ -1,7 +1,8 @@
-[gd_scene load_steps=13 format=3 uid="uid://blevel01"]
+[gd_scene load_steps=15 format=3 uid="uid://blevel01"]
 
 [ext_resource type="PackedScene" uid="uid://bplayer001" path="res://player/Player.tscn" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://benemy001" path="res://enemy/Enemy.tscn" id="2_enemy"]
+[ext_resource type="PackedScene" uid="uid://corange001" path="res://enemy/OrangeEnemy.tscn" id="9_orange"]
 [ext_resource type="PackedScene" uid="uid://bdoor001" path="res://interactables/ExitDoor.tscn" id="3_door"]
 [ext_resource type="PackedScene" uid="uid://bhud001" path="res://ui/HUD.tscn" id="4_hud"]
 [ext_resource type="Script" path="res://level/BackgroundGenerator.gd" id="5_bg"]
@@ -11,7 +12,7 @@
 [ext_resource type="Script" path="res://level/AmbientEffects.gd" id="9_ambient"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
-size = Vector2(1024, 16)
+size = Vector2(2048, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
 size = Vector2(16, 768)
@@ -25,11 +26,17 @@ size = Vector2(16, 250)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_obstacle_horizontal"]
 size = Vector2(200, 16)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bar_short_h"]
+size = Vector2(80, 12)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bar_short_v"]
+size = Vector2(12, 80)
+
 [node name="Level01" type="Node2D"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 script = ExtResource("7_camera")
-level_width = 1024.0
+level_width = 2048.0
 level_height = 768.0
 
 [node name="LevelTitle" type="Label" parent="."]
@@ -46,7 +53,7 @@ Get to the green door!"
 [node name="Walls" type="Node2D" parent="."]
 
 [node name="WallTop" type="StaticBody2D" parent="Walls"]
-position = Vector2(512, 8)
+position = Vector2(1024, 8)
 collision_layer = 1
 collision_mask = 0
 
@@ -54,21 +61,21 @@ collision_mask = 0
 shape = SubResource("RectangleShape2D_wall_h")
 
 [node name="ColorRect" type="ColorRect" parent="Walls/WallTop"]
-offset_left = -512.0
+offset_left = -1024.0
 offset_top = -8.0
-offset_right = 512.0
+offset_right = 1024.0
 offset_bottom = 8.0
 color = Color(0.4, 0.5, 0.7, 1)
 
 [node name="ColorRect2" type="ColorRect" parent="Walls/WallTop"]
-offset_left = -512.0
+offset_left = -1024.0
 offset_top = -6.0
-offset_right = 512.0
+offset_right = 1024.0
 offset_bottom = 6.0
 color = Color(0.5, 0.6, 0.8, 1)
 
 [node name="WallBottom" type="StaticBody2D" parent="Walls"]
-position = Vector2(512, 760)
+position = Vector2(1024, 760)
 collision_layer = 1
 collision_mask = 0
 
@@ -76,16 +83,16 @@ collision_mask = 0
 shape = SubResource("RectangleShape2D_wall_h")
 
 [node name="ColorRect" type="ColorRect" parent="Walls/WallBottom"]
-offset_left = -512.0
+offset_left = -1024.0
 offset_top = -8.0
-offset_right = 512.0
+offset_right = 1024.0
 offset_bottom = 8.0
 color = Color(0.4, 0.5, 0.7, 1)
 
 [node name="ColorRect2" type="ColorRect" parent="Walls/WallBottom"]
-offset_left = -512.0
+offset_left = -1024.0
 offset_top = -6.0
-offset_right = 512.0
+offset_right = 1024.0
 offset_bottom = 6.0
 color = Color(0.5, 0.6, 0.8, 1)
 
@@ -112,7 +119,7 @@ offset_bottom = 384.0
 color = Color(0.5, 0.6, 0.8, 1)
 
 [node name="WallRight" type="StaticBody2D" parent="Walls"]
-position = Vector2(1016, 384)
+position = Vector2(2040, 384)
 collision_layer = 1
 collision_mask = 0
 
@@ -193,6 +200,156 @@ offset_right = 8.0
 offset_bottom = 75.0
 color = Color(0.5, 0.6, 0.8, 1)
 
+[node name="Bar1" type="StaticBody2D" parent="Walls"]
+position = Vector2(400, 300)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/Bar1"]
+shape = SubResource("RectangleShape2D_bar_short_h")
+
+[node name="ColorRect" type="ColorRect" parent="Walls/Bar1"]
+offset_left = -40.0
+offset_top = -6.0
+offset_right = 40.0
+offset_bottom = 6.0
+color = Color(0.5, 0.6, 0.8, 1)
+
+[node name="Bar2" type="StaticBody2D" parent="Walls"]
+position = Vector2(600, 500)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/Bar2"]
+shape = SubResource("RectangleShape2D_bar_short_v")
+
+[node name="ColorRect" type="ColorRect" parent="Walls/Bar2"]
+offset_left = -6.0
+offset_top = -40.0
+offset_right = 6.0
+offset_bottom = 40.0
+color = Color(0.5, 0.6, 0.8, 1)
+
+[node name="Bar3" type="StaticBody2D" parent="Walls"]
+position = Vector2(900, 200)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/Bar3"]
+shape = SubResource("RectangleShape2D_bar_short_h")
+
+[node name="ColorRect" type="ColorRect" parent="Walls/Bar3"]
+offset_left = -40.0
+offset_top = -6.0
+offset_right = 40.0
+offset_bottom = 6.0
+color = Color(0.5, 0.6, 0.8, 1)
+
+[node name="Bar4" type="StaticBody2D" parent="Walls"]
+position = Vector2(1200, 600)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/Bar4"]
+shape = SubResource("RectangleShape2D_bar_short_v")
+
+[node name="ColorRect" type="ColorRect" parent="Walls/Bar4"]
+offset_left = -6.0
+offset_top = -40.0
+offset_right = 6.0
+offset_bottom = 40.0
+color = Color(0.5, 0.6, 0.8, 1)
+
+[node name="Bar5" type="StaticBody2D" parent="Walls"]
+position = Vector2(1400, 350)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/Bar5"]
+shape = SubResource("RectangleShape2D_bar_short_h")
+
+[node name="ColorRect" type="ColorRect" parent="Walls/Bar5"]
+offset_left = -40.0
+offset_top = -6.0
+offset_right = 40.0
+offset_bottom = 6.0
+color = Color(0.5, 0.6, 0.8, 1)
+
+[node name="Bar6" type="StaticBody2D" parent="Walls"]
+position = Vector2(1600, 550)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/Bar6"]
+shape = SubResource("RectangleShape2D_bar_short_v")
+
+[node name="ColorRect" type="ColorRect" parent="Walls/Bar6"]
+offset_left = -6.0
+offset_top = -40.0
+offset_right = 6.0
+offset_bottom = 40.0
+color = Color(0.5, 0.6, 0.8, 1)
+
+[node name="Bar7" type="StaticBody2D" parent="Walls"]
+position = Vector2(1800, 250)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/Bar7"]
+shape = SubResource("RectangleShape2D_bar_short_h")
+
+[node name="ColorRect" type="ColorRect" parent="Walls/Bar7"]
+offset_left = -40.0
+offset_top = -6.0
+offset_right = 40.0
+offset_bottom = 6.0
+color = Color(0.5, 0.6, 0.8, 1)
+
+[node name="Bar8" type="StaticBody2D" parent="Walls"]
+position = Vector2(550, 150)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/Bar8"]
+shape = SubResource("RectangleShape2D_bar_short_v")
+
+[node name="ColorRect" type="ColorRect" parent="Walls/Bar8"]
+offset_left = -6.0
+offset_top = -40.0
+offset_right = 6.0
+offset_bottom = 40.0
+color = Color(0.5, 0.6, 0.8, 1)
+
+[node name="Bar9" type="StaticBody2D" parent="Walls"]
+position = Vector2(1100, 150)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/Bar9"]
+shape = SubResource("RectangleShape2D_bar_short_h")
+
+[node name="ColorRect" type="ColorRect" parent="Walls/Bar9"]
+offset_left = -40.0
+offset_top = -6.0
+offset_right = 40.0
+offset_bottom = 6.0
+color = Color(0.5, 0.6, 0.8, 1)
+
+[node name="Bar10" type="StaticBody2D" parent="Walls"]
+position = Vector2(1500, 150)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/Bar10"]
+shape = SubResource("RectangleShape2D_bar_short_v")
+
+[node name="ColorRect" type="ColorRect" parent="Walls/Bar10"]
+offset_left = -6.0
+offset_top = -40.0
+offset_right = 6.0
+offset_bottom = 40.0
+color = Color(0.5, 0.6, 0.8, 1)
+
 [node name="Player" parent="." instance=ExtResource("1_player")]
 position = Vector2(128, 640)
 
@@ -208,12 +365,28 @@ patrol_distance = 120.0
 position = Vector2(750, 550)
 patrol_distance = 140.0
 
-[node name="Enemy4" parent="." instance=ExtResource("2_enemy")]
+[node name="Enemy4" parent="." instance=ExtResource("9_orange")]
 position = Vector2(400, 680)
 patrol_distance = 100.0
 
+[node name="Enemy5" parent="." instance=ExtResource("9_orange")]
+position = Vector2(1100, 400)
+patrol_distance = 150.0
+
+[node name="Enemy6" parent="." instance=ExtResource("9_orange")]
+position = Vector2(1300, 200)
+patrol_distance = 120.0
+
+[node name="Enemy7" parent="." instance=ExtResource("9_orange")]
+position = Vector2(1500, 500)
+patrol_distance = 140.0
+
+[node name="Enemy8" parent="." instance=ExtResource("9_orange")]
+position = Vector2(1700, 300)
+patrol_distance = 130.0
+
 [node name="ExitDoor" parent="." instance=ExtResource("3_door")]
-position = Vector2(896, 640)
+position = Vector2(2000, 384)
 next_level_path = "res://level/level_02.tscn"
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
@@ -225,6 +398,8 @@ script = ExtResource("6_levelmgr")
 script = ExtResource("5_bg")
 color_scheme = 0
 pattern_density = 1.0
+level_width = 2048.0
+level_height = 768.0
 
 [node name="MaskLighting" type="Node2D" parent="."]
 script = ExtResource("8_lighting")

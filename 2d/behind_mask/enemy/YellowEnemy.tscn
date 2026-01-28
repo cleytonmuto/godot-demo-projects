@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://benemy001"]
+[gd_scene load_steps=2 format=3 uid="uid://corange001"]
 
-[ext_resource type="Script" path="res://enemy/Enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://enemy/YellowEnemy.gd" id="1_yellow"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
 radius = 14.0
@@ -8,13 +8,14 @@ radius = 14.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_hitarea"]
 radius = 20.0
 
-[node name="Enemy" type="CharacterBody2D"]
+[node name="YellowEnemy" type="CharacterBody2D" groups=["enemies"]]
 collision_layer = 4
-script = ExtResource("1_enemy")
+collision_mask = 1
+script = ExtResource("1_yellow")
 
 [node name="DetectionCircle" type="Polygon2D" parent="."]
 z_index = -5
-color = Color(1, 0.3, 0.3, 0.08)
+color = Color(1, 0.9, 0.2, 0.08)
 
 [node name="Visual" type="Node2D" parent="."]
 
@@ -23,42 +24,42 @@ offset_left = -16.0
 offset_top = -12.0
 offset_right = 16.0
 offset_bottom = 16.0
-color = Color(0.6, 0.1, 0.1, 1)
+color = Color(0.6, 0.5, 0.1, 1)
 
 [node name="Body" type="ColorRect" parent="Visual"]
 offset_left = -16.0
 offset_top = -16.0
 offset_right = 16.0
 offset_bottom = 14.0
-color = Color(1, 0.3, 0.3, 1)
+color = Color(1, 0.9, 0.2, 1)
 
 [node name="BodyDetail" type="ColorRect" parent="Visual"]
 offset_left = -14.0
 offset_top = -14.0
 offset_right = 14.0
 offset_bottom = 12.0
-color = Color(1, 0.4, 0.4, 1)
+color = Color(1, 1, 0.4, 1)
 
 [node name="Chest" type="ColorRect" parent="Visual"]
 offset_left = -10.0
 offset_top = -8.0
 offset_right = 10.0
 offset_bottom = 8.0
-color = Color(0.9, 0.25, 0.25, 1)
+color = Color(0.9, 0.8, 0.15, 1)
 
 [node name="ShoulderLeft" type="ColorRect" parent="Visual"]
 offset_left = -18.0
 offset_top = -12.0
 offset_right = -14.0
 offset_bottom = -4.0
-color = Color(0.8, 0.2, 0.2, 1)
+color = Color(0.8, 0.7, 0.1, 1)
 
 [node name="ShoulderRight" type="ColorRect" parent="Visual"]
 offset_left = 14.0
 offset_top = -12.0
 offset_right = 18.0
 offset_bottom = -4.0
-color = Color(0.8, 0.2, 0.2, 1)
+color = Color(0.8, 0.7, 0.1, 1)
 
 [node name="Eye1Outer" type="ColorRect" parent="Visual"]
 offset_left = -12.0
@@ -114,7 +115,7 @@ offset_left = -8.0
 offset_top = -40.0
 offset_right = 8.0
 offset_bottom = -20.0
-theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_colors/font_color = Color(1, 0.9, 0, 1)
 theme_override_font_sizes/font_size = 24
 text = "!"
 horizontal_alignment = 1

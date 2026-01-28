@@ -11,7 +11,8 @@ class_name Sword
 
 var is_swinging := false
 var swing_angle := 0.0
-var hit_enemies: Array[BaseEnemy] = []  # Track enemies already hit this swing
+# Track enemies already hit this swing (bosses and normals)
+var hit_enemies: Array = []
 
 @onready var visual := $Visual
 @onready var collision_shape := $CollisionShape2D
@@ -23,6 +24,8 @@ func _ready() -> void:
 	_create_visual()
 	# Connect hit detection
 	hit_area.body_entered.connect(_on_enemy_hit)
+	# Also detect overlapping areas (e.g. boss hit areas)
+	hit_area.area_entered.connect(_on_enemy_area_hit)
 	# Start invisible and disabled
 	visible = false
 	collision_shape.disabled = true
@@ -97,6 +100,30 @@ func swing() -> void:
 	is_swinging = false
 	hit_enemies.clear()
 
+func _physics_process(_delta: float) -> void:
+	# Fallback hit detection using distance + arc check,
+	# in case physics callbacks miss the overlap (ensures boss can be damaged).
+	if not is_swinging:
+		return
+	
+	var enemies := get_tree().get_nodes_in_group("enemies")
+	for enemy in enemies:
+		if enemy in hit_enemies:
+			continue
+		
+		if not enemy.has_method("take_damage"):
+			continue
+		
+		var to_enemy: Vector2 = enemy.global_position - global_position
+		if to_enemy.length() > swing_radius:
+			continue
+		
+		# Check if enemy is within swing arc around the sword's current angle
+		var angle_to_enemy := wrapf(to_enemy.angle() - swing_angle, -PI, PI)
+		if abs(angle_to_enemy) <= arc_angle * 0.5:
+			hit_enemies.append(enemy)
+			enemy.take_damage(damage, global_position)
+
 func _set_swing_angle(angle: float) -> void:
 	swing_angle = angle
 	visual.rotation = angle
@@ -115,15 +142,38 @@ func _on_enemy_hit(body: Node2D) -> void:
 	if not is_swinging:
 		return
 	
-	if body.is_in_group("enemies") and body is BaseEnemy:
-		var enemy := body as BaseEnemy
-		# Prevent multiple hits on the same enemy in one swing
-		if enemy in hit_enemies:
+	# Hit any enemy or boss that can take damage
+	if body.is_in_group("enemies") or body.is_in_group("bosses"):
+		# Prevent multiple hits on the same target in one swing
+		if body in hit_enemies:
 			return
 		
-		hit_enemies.append(enemy)
-		if enemy.has_method("take_damage"):
-			enemy.take_damage(damage)
+		hit_enemies.append(body)
+		if body.has_method("take_damage"):
+			body.take_damage(damage, global_position)
+
+func _on_enemy_area_hit(area: Area2D) -> void:
+	# Only hit enemies during active swing
+	if not is_swinging:
+		return
+	
+	# Areas themselves may not be in groups; check their owner/parent
+	var target: Node = area
+	if area.get_parent():
+		var parent := area.get_parent()
+		if parent.is_in_group("enemies") or parent.is_in_group("bosses"):
+			target = parent
+	
+	if not (target.is_in_group("enemies") or target.is_in_group("bosses")):
+		return
+	
+	# Prevent multiple hits on the same target in one swing
+	if target in hit_enemies:
+		return
+	
+	hit_enemies.append(target)
+	if target.has_method("take_damage"):
+		target.take_damage(damage, global_position)
 
 func _spawn_new_enemies(position: Vector2) -> void:
 	# Signal to spawn new enemies (handled by level manager)

@@ -7,6 +7,7 @@ class_name ExitDoor
 @export var requires_boss := false
 
 var boss_defeated := false
+var bosses_remaining := 0
 var player_inside := false
 var is_entering := false
 
@@ -25,26 +26,36 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 	
-	# Door is always available - no boss requirement
-	visible = true
-	if collision:
-		collision.disabled = false
+	# Add to group for easier lookup
+	add_to_group("exit_doors")
+	
+	# Handle boss requirement: keep door locked until all bosses are defeated
+	if requires_boss:
+		visible = false
+		if collision:
+			collision.disabled = true
+		
+		# Connect to all existing bosses so we can unlock when they all die
+		var bosses := get_tree().get_nodes_in_group("bosses")
+		bosses_remaining = bosses.size()
+		for boss in bosses:
+			if boss.has_signal("boss_defeated") and not boss.boss_defeated.is_connected(_on_boss_defeated):
+				boss.boss_defeated.connect(_on_boss_defeated)
+	else:
+		# No boss required - door starts unlocked
+		visible = true
+		if collision:
+			collision.disabled = false
 	
 	# Debug: Print door status
 	print("ExitDoor ready - next_level: ", next_level_path, ", position: ", global_position, ", monitoring: ", monitoring, ", collision disabled: ", collision.disabled if collision else "no collision")
 
 func _on_boss_defeated() -> void:
-	boss_defeated = true
-	
-	# Check if all bosses are defeated
-	var bosses := get_tree().get_nodes_in_group("bosses")
-	var all_defeated := true
-	for boss in bosses:
-		if is_instance_valid(boss):
-			all_defeated = false
-			break
-	
-	if all_defeated:
+	# Count remaining bosses
+	bosses_remaining -= 1
+	if bosses_remaining <= 0:
+		boss_defeated = true
+		# All bosses defeated - unlock the door
 		_unlock_door()
 
 func _unlock_door() -> void:
@@ -63,7 +74,13 @@ func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		player_inside = true
 		print("ExitDoor: Player entered - is_entering: ", is_entering, ", collision disabled: ", collision.disabled if collision else "no collision")
-		# Door always works - no conditions
+		
+		# If the door requires a boss, ensure it has been defeated
+		if requires_boss and not boss_defeated:
+			print("ExitDoor: Door locked - boss not defeated yet")
+			return
+		
+		# Door is available
 		if not is_entering:
 			print("ExitDoor: Entering door")
 			_enter_door()
@@ -71,6 +88,10 @@ func _on_body_entered(body: Node2D) -> void:
 func _process(_delta: float) -> void:
 	# Fallback: Check if player is near door (in case body_entered doesn't fire)
 	if is_entering:
+		return
+	
+	# If the door requires a boss and it's not dead yet, do nothing
+	if requires_boss and not boss_defeated:
 		return
 	
 	var player := get_tree().get_first_node_in_group("player")

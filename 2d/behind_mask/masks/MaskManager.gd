@@ -11,7 +11,7 @@ enum Mask {
 	GUARD,
 	GHOST,
 	PREDATOR,
-	DECOY
+	DECOY  
 }
 
 const MASK_COLORS := {

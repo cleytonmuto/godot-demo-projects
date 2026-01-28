@@ -7,10 +7,13 @@ class_name BaseEnemy
 @export var patrol_distance := 64.0
 @export var detection_radius := 180.0
 @export var communication_radius := 250.0
-@export var max_health := 1
-@export var health := 1
+@export var max_health := 2
+@export var health := 2
 @export var shoot_interval := 2.0
 @export var shoot_range := 400.0
+@export var knockback_force := 1200.0
+@export var knockback_decay := 0.85
+@export var knockback_duration := 0.2
 
 ## Patrol pattern: 0=horizontal, 1=vertical, 2=circular, 3=random
 @export_enum("Horizontal", "Vertical", "Circular", "Random") var patrol_pattern := 0
@@ -40,6 +43,11 @@ var alerted_by_ally := false
 # Shooting
 var shoot_timer := 0.0
 var bullet_scene: PackedScene
+
+# Knockback
+var knockback_velocity := Vector2.ZERO
+var knockback_timer := 0.0
+var is_knocked_back := false
 
 @onready var visual := $Visual
 @onready var detection_circle := $DetectionCircle
@@ -83,6 +91,13 @@ func _physics_process(delta: float) -> void:
 	if not is_instance_valid(player):
 		return
 	
+	# Update knockback timer
+	if is_knocked_back:
+		knockback_timer -= delta
+		if knockback_timer <= 0:
+			is_knocked_back = false
+			knockback_velocity = Vector2.ZERO
+	
 	# Update memory timer
 	if has_memory:
 		memory_timer -= delta
@@ -108,6 +123,28 @@ func _physics_process(delta: float) -> void:
 		last_seen_position = player.global_position
 		has_memory = true
 		memory_timer = memory_duration
+	
+	# If knocked back, prioritize knockback movement over AI
+	if is_knocked_back:
+		# During knockback, reduce AI movement and let knockback dominate
+		var ai_velocity := Vector2.ZERO
+		match current_state:
+			State.PATROL:
+				_do_hunt(delta)
+			State.ALERT, State.CHASE:
+				_do_chase()
+			State.FLEE:
+				_do_flee()
+			State.INVESTIGATE:
+				_do_hunt(delta)
+		
+		# Blend AI movement with knockback (knockback is stronger)
+		velocity = velocity * 0.3 + knockback_velocity
+		knockback_velocity *= knockback_decay
+		move_and_slide()
+		if velocity.x != 0:
+			visual.scale.x = sign(velocity.x)
+		return
 	
 	# PRIORITY: If player wears Guard mask, wander randomly (ignore player)
 	if should_ignore:
@@ -314,8 +351,35 @@ func _shoot_at(target_pos: Vector2) -> void:
 	bullet.setup(global_position, target_pos)
 	AudioManager.play_enemy_shoot()
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, hit_position: Vector2 = Vector2.ZERO) -> void:
 	health -= amount
+	
+	# Apply animated knockback if hit position is provided
+	if hit_position != Vector2.ZERO:
+		var knockback_direction := (global_position - hit_position).normalized()
+		# Ensure we have a valid direction
+		if knockback_direction.length() < 0.1:
+			# Fallback: push away from player if hit position is too close
+			if is_instance_valid(player):
+				knockback_direction = (global_position - player.global_position).normalized()
+			else:
+				knockback_direction = Vector2(randf_range(-1, 1), randf_range(-1, 1)).normalized()
+		
+		# Set strong initial knockback
+		knockback_velocity = knockback_direction * knockback_force
+		is_knocked_back = true
+		knockback_timer = knockback_duration
+		
+		# Visual knockback animation - tilt enemy slightly
+		var tilt_tween := create_tween()
+		var tilt_amount := knockback_direction.x * 0.2  # Tilt based on knockback direction
+		visual.rotation = tilt_amount
+		tilt_tween.tween_property(visual, "rotation", 0.0, knockback_duration)
+		
+		# Scale animation - enemy "shrinks" slightly when hit
+		var scale_tween := create_tween()
+		visual.scale = Vector2(0.9, 0.9)
+		scale_tween.tween_property(visual, "scale", Vector2(1.0, 1.0), knockback_duration * 0.5)
 	
 	# Visual feedback
 	var flash_tween := create_tween()
