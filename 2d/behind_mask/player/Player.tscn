@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://bplayer001"]
+[gd_scene load_steps=4 format=3 uid="uid://bplayer001"]
 
 [ext_resource type="Script" path="res://player/Player.gd" id="1_player"]
 [ext_resource type="Script" path="res://masks/MaskManager.gd" id="2_mask"]
+[ext_resource type="PackedScene" uid="uid://bsword001" path="res://player/Sword.tscn" id="3_sword"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 16.0
@@ -172,3 +173,5 @@ shape = SubResource("CircleShape2D_player")
 
 [node name="MaskManager" type="Node" parent="."]
 script = ExtResource("2_mask")
+
+[node name="Sword" parent="." instance=ExtResource("3_sword")]

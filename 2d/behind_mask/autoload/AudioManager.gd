@@ -100,6 +100,24 @@ func play_cooldown_ready() -> void:
 	player.pitch_scale = 1.0
 	player.play()
 
+func play_sword_swing() -> void:
+	var player := _get_available_sfx_player()
+	player.stream = _generate_sword_sound()
+	player.pitch_scale = randf_range(0.9, 1.1)
+	player.play()
+
+func play_player_hurt() -> void:
+	var player := _get_available_sfx_player()
+	player.stream = _generate_hurt_sound()
+	player.pitch_scale = randf_range(0.95, 1.05)
+	player.play()
+
+func play_enemy_shoot() -> void:
+	var player := _get_available_sfx_player()
+	player.stream = _generate_shoot_sound()
+	player.pitch_scale = randf_range(0.9, 1.1)
+	player.play()
+
 # ============ BACKGROUND MUSIC ============
 
 func play_bgm() -> void:
@@ -409,4 +427,91 @@ func _generate_bgm() -> AudioStreamWAV:
 	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
 	stream.loop_begin = 0
 	stream.loop_end = num_samples
+	return stream
+
+func _generate_sword_sound() -> AudioStreamWAV:
+	# Sharp "whoosh" sound for sword swing
+	var sample_rate := 22050
+	var duration := 0.25
+	var num_samples := int(duration * sample_rate)
+	var data := PackedByteArray()
+	data.resize(num_samples * 2)
+	
+	for i in range(num_samples):
+		var t := float(i) / sample_rate
+		var progress := t / duration
+		var envelope := (1.0 - progress * progress)  # Quick fade
+		
+		# Sweeping frequency (whoosh effect)
+		var freq: float = lerp(200.0, 50.0, progress)
+		var sample := sin(t * freq * TAU) * envelope * 0.4
+		
+		# Add high frequency component
+		sample += sin(t * freq * 3.0 * TAU) * envelope * 0.2
+		
+		var sample_int := int(clamp(sample * 32767, -32768, 32767))
+		data[i * 2] = sample_int & 0xFF
+		data[i * 2 + 1] = (sample_int >> 8) & 0xFF
+	
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = sample_rate
+	stream.data = data
+	return stream
+
+func _generate_hurt_sound() -> AudioStreamWAV:
+	# Quick "ouch" sound
+	var sample_rate := 22050
+	var duration := 0.15
+	var num_samples := int(duration * sample_rate)
+	var data := PackedByteArray()
+	data.resize(num_samples * 2)
+	
+	for i in range(num_samples):
+		var t := float(i) / sample_rate
+		var progress := t / duration
+		var envelope := (1.0 - progress) * (1.0 - progress)
+		
+		# Descending tone
+		var freq: float = lerp(400.0, 200.0, progress)
+		var sample := sin(t * freq * TAU) * envelope * 0.3
+		
+		var sample_int := int(clamp(sample * 32767, -32768, 32767))
+		data[i * 2] = sample_int & 0xFF
+		data[i * 2 + 1] = (sample_int >> 8) & 0xFF
+	
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = sample_rate
+	stream.data = data
+	return stream
+
+func _generate_shoot_sound() -> AudioStreamWAV:
+	# Sharp "pew" sound for enemy bullets
+	var sample_rate := 22050
+	var duration := 0.1
+	var num_samples := int(duration * sample_rate)
+	var data := PackedByteArray()
+	data.resize(num_samples * 2)
+	
+	for i in range(num_samples):
+		var t := float(i) / sample_rate
+		var progress := t / duration
+		var envelope := (1.0 - progress) * (1.0 - progress)
+		
+		# Quick high frequency burst
+		var freq: float = lerp(800.0, 400.0, progress)
+		var sample := sin(t * freq * TAU) * envelope * 0.25
+		
+		# Add noise component
+		sample += (randf() * 2.0 - 1.0) * envelope * 0.1
+		
+		var sample_int := int(clamp(sample * 32767, -32768, 32767))
+		data[i * 2] = sample_int & 0xFF
+		data[i * 2 + 1] = (sample_int >> 8) & 0xFF
+	
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = sample_rate
+	stream.data = data
 	return stream

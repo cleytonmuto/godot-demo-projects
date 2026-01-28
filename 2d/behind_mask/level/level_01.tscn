@@ -1,9 +1,14 @@
-[gd_scene load_steps=12 format=3 uid="uid://blevel01"]
+[gd_scene load_steps=13 format=3 uid="uid://blevel01"]
 
 [ext_resource type="PackedScene" uid="uid://bplayer001" path="res://player/Player.tscn" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://benemy001" path="res://enemy/Enemy.tscn" id="2_enemy"]
 [ext_resource type="PackedScene" uid="uid://bdoor001" path="res://interactables/ExitDoor.tscn" id="3_door"]
 [ext_resource type="PackedScene" uid="uid://bhud001" path="res://ui/HUD.tscn" id="4_hud"]
+[ext_resource type="Script" path="res://level/BackgroundGenerator.gd" id="5_bg"]
+[ext_resource type="Script" path="res://level/LevelManager.gd" id="6_levelmgr"]
+[ext_resource type="Script" path="res://level/LevelCamera.gd" id="7_camera"]
+[ext_resource type="Script" path="res://level/MaskLighting.gd" id="8_lighting"]
+[ext_resource type="Script" path="res://level/AmbientEffects.gd" id="9_ambient"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(1024, 16)
@@ -21,6 +26,11 @@ size = Vector2(16, 250)
 size = Vector2(200, 16)
 
 [node name="Level01" type="Node2D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("7_camera")
+level_width = 1024.0
+level_height = 768.0
 
 [node name="LevelTitle" type="Label" parent="."]
 offset_left = 320.0
@@ -208,22 +218,16 @@ next_level_path = "res://level/level_02.tscn"
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
 
-[node name="Background" type="ColorRect" parent="."]
-z_index = -10
-offset_right = 1024.0
-offset_bottom = 768.0
-color = Color(0.15, 0.2, 0.35, 1)
+[node name="LevelManager" type="Node" parent="."]
+script = ExtResource("6_levelmgr")
 
-[node name="BackgroundGradient" type="ColorRect" parent="."]
-z_index = -9
-offset_right = 1024.0
-offset_bottom = 384.0
-color = Color(0.3, 0.4, 0.6, 0.5)
+[node name="BackgroundGenerator" type="Node2D" parent="."]
+script = ExtResource("5_bg")
+color_scheme = 0
+pattern_density = 1.0
 
-[node name="BackgroundPattern" type="ColorRect" parent="."]
-z_index = -8
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 1024.0
-offset_bottom = 768.0
-color = Color(0.2, 0.25, 0.4, 0.3)
+[node name="MaskLighting" type="Node2D" parent="."]
+script = ExtResource("8_lighting")
+
+[node name="AmbientEffects" type="Node2D" parent="."]
+script = ExtResource("9_ambient")

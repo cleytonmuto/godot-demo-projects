@@ -22,6 +22,9 @@ config/icon="res://icon.webp"
 
 Game="*res://autoload/Game.gd"
 AudioManager="*res://autoload/AudioManager.gd"
+ParticleManager="*res://autoload/ParticleManager.gd"
+ScoreManager="*res://autoload/ScoreManager.gd"
+EffectManager="*res://autoload/EffectManager.gd"
 
 [debug]
 
@@ -35,7 +38,7 @@ window/stretch/mode="canvas_items"
 
 [editor]
 
-movie_writer/movie_file="C:/Users/RAYRA/Videos/Captures/output.avi"
+movie_writer/movie_file="C:/Users/RAYRA/Videos/Captures/output3.avi"
 
 [input]
 
@@ -79,6 +82,7 @@ restart={
 2d_physics/layer_1="world"
 2d_physics/layer_2="player"
 2d_physics/layer_3="enemy"
+2d_physics/layer_4="enemy_bullets"
 
 [rendering]
 

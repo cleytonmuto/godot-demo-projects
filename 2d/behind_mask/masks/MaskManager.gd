@@ -86,6 +86,9 @@ var total_mask_switches := 0
 var mask_timer: Timer
 const MASK_DURATION := 3.0  # Each mask lasts 3 seconds
 
+# Custom rotation order: white, blue, yellow, gray, red
+const MASK_ROTATION_ORDER := [Mask.NEUTRAL, Mask.GUARD, Mask.DECOY, Mask.GHOST, Mask.PREDATOR]
+
 func _ready() -> void:
 	_reset_charges()
 	_setup_auto_rotation()
@@ -107,7 +110,17 @@ func _setup_auto_rotation() -> void:
 func _auto_cycle_mask() -> void:
 	# Automatic rotation - skip cooldown and charge checks
 	var previous_mask := current_mask
-	var next_mask := ((current_mask as int) + 1) % Mask.size() as Mask
+	
+	# Find current mask index in rotation order
+	var current_index := 0
+	for i in range(MASK_ROTATION_ORDER.size()):
+		if MASK_ROTATION_ORDER[i] == current_mask:
+			current_index = i
+			break
+	
+	# Move to next mask in rotation order
+	var next_index := (current_index + 1) % MASK_ROTATION_ORDER.size()
+	var next_mask := MASK_ROTATION_ORDER[next_index] as Mask
 	
 	current_mask = next_mask
 	

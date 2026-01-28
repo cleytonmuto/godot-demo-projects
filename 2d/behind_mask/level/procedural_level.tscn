@@ -1,0 +1,47 @@
+[gd_scene load_steps=8 format=3 uid="uid://dervbotqh6iwu"]
+
+[ext_resource type="PackedScene" uid="uid://bhud001" path="res://ui/HUD.tscn" id="1_hud"]
+[ext_resource type="Script" path="res://level/ProceduralLevel.gd" id="2_proc"]
+[ext_resource type="Script" path="res://level/LevelCamera.gd" id="3_camera"]
+[ext_resource type="Script" path="res://level/BackgroundGenerator.gd" id="4_bg"]
+[ext_resource type="Script" path="res://level/LevelManager.gd" id="5_levelmgr"]
+[ext_resource type="Script" path="res://level/MaskLighting.gd" id="6_lighting"]
+[ext_resource type="Script" path="res://level/AmbientEffects.gd" id="7_ambient"]
+
+[node name="ProceduralLevel" type="Node2D"]
+script = ExtResource("2_proc")
+level_width = 2048.0
+level_height = 768.0
+room_count = 5
+enemy_count = 8
+boss_count = 1
+
+[node name="Walls" type="Node2D" parent="."]
+
+[node name="PlayerSpawn" type="Marker2D" parent="."]
+position = Vector2(100, 384)
+
+[node name="ExitDoor" type="Node2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("3_camera")
+level_width = 2048.0
+level_height = 768.0
+
+[node name="HUD" parent="." instance=ExtResource("1_hud")]
+
+[node name="LevelManager" type="Node" parent="."]
+script = ExtResource("5_levelmgr")
+
+[node name="BackgroundGenerator" type="Node2D" parent="."]
+script = ExtResource("4_bg")
+color_scheme = 4
+pattern_density = 1.2
+level_width = 2048.0
+level_height = 768.0
+
+[node name="MaskLighting" type="Node2D" parent="."]
+script = ExtResource("6_lighting")
+
+[node name="AmbientEffects" type="Node2D" parent="."]
+script = ExtResource("7_ambient")

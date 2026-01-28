@@ -7,6 +7,10 @@ class_name BaseEnemy
 @export var patrol_distance := 64.0
 @export var detection_radius := 180.0
 @export var communication_radius := 250.0
+@export var max_health := 1
+@export var health := 1
+@export var shoot_interval := 2.0
+@export var shoot_range := 400.0
 
 ## Patrol pattern: 0=horizontal, 1=vertical, 2=circular, 3=random
 @export_enum("Horizontal", "Vertical", "Circular", "Random") var patrol_pattern := 0
@@ -33,6 +37,10 @@ var random_wait_timer := 0.0
 # Communication
 var alerted_by_ally := false
 
+# Shooting
+var shoot_timer := 0.0
+var bullet_scene: PackedScene
+
 @onready var visual := $Visual
 @onready var detection_circle := $DetectionCircle
 @onready var alert_indicator := $AlertIndicator
@@ -44,6 +52,10 @@ func _ready() -> void:
 	_draw_detection_circle()
 	alert_indicator.visible = false
 	add_to_group("enemies")
+	health = max_health
+	
+	# Load bullet scene
+	bullet_scene = preload("res://enemy/EnemyBullet.tscn")
 	
 	# Wait a frame to ensure player is ready
 	await get_tree().process_frame
@@ -76,6 +88,15 @@ func _physics_process(delta: float) -> void:
 		memory_timer -= delta
 		if memory_timer <= 0:
 			has_memory = false
+	
+	# Update shoot timer
+	shoot_timer += delta
+	if shoot_timer >= shoot_interval:
+		_try_shoot()
+		shoot_timer = 0.0
+	
+	# Animate visual based on movement
+	_animate_movement(delta)
 	
 	# Check mask states - GUARD (blue) is priority ignore, PREDATOR (red) causes flee
 	var should_ignore: bool = mask_manager != null and not mask_manager.can_enemy_chase() and not mask_manager.should_enemy_flee()
@@ -262,10 +283,89 @@ func _on_mask_changed(_mask: int) -> void:
 	elif mask_manager.can_enemy_chase():
 		_enter_chase_state_fast()
 
+func _try_shoot() -> void:
+	if not is_instance_valid(player):
+		return
+	
+	# Only shoot if player is in range and we can see them
+	var distance := global_position.distance_to(player.global_position)
+	if distance > shoot_range:
+		return
+	
+	# Check if we should shoot (not ignoring player, not fleeing)
+	var should_ignore: bool = mask_manager != null and not mask_manager.can_enemy_chase() and not mask_manager.should_enemy_flee()
+	var should_flee: bool = mask_manager != null and mask_manager.should_enemy_flee()
+	
+	if should_ignore or should_flee:
+		return
+	
+	# Shoot at player
+	_shoot_at(player.global_position)
+
+func _shoot_at(target_pos: Vector2) -> void:
+	if not bullet_scene:
+		return
+	
+	var bullet := bullet_scene.instantiate() as EnemyBullet
+	if not bullet:
+		return
+	
+	get_tree().current_scene.add_child(bullet)
+	bullet.setup(global_position, target_pos)
+	AudioManager.play_enemy_shoot()
+
+func take_damage(amount: int) -> void:
+	health -= amount
+	
+	# Visual feedback
+	var flash_tween := create_tween()
+	flash_tween.tween_property(visual, "modulate", Color(2, 0.5, 0.5, 1), 0.1)
+	flash_tween.tween_property(visual, "modulate", Color.WHITE, 0.1)
+	
+	# Damage number
+	DamageNumber.create(global_position, amount)
+	
+	# Hit sparks
+	ParticleManager.create_hit_sparks(global_position, Color(1, 0.8, 0.2))
+	
+	# Camera shake
+	Game.shake_camera(0.05, 0.1)
+	
+	if health <= 0:
+		_die()
+
+func _die() -> void:
+	# Add score
+	var enemy_type := "normal"
+	if self is DetectorEnemy:
+		enemy_type = "detector"
+	elif self is HunterEnemy:
+		enemy_type = "hunter"
+	elif self is MimicEnemy:
+		enemy_type = "mimic"
+	
+	ScoreManager.add_kill_score(enemy_type)
+	
+	# Slow-mo effect on kill
+	EffectManager.slow_mo(0.15, 0.4)
+	
+	# Explosion effect
+	ParticleManager.create_explosion(global_position, 1.0, Color(1, 0.3, 0.1))
+	
+	# Spawn new enemies before dying
+	_spawn_new_enemies()
+	queue_free()
+
+func _spawn_new_enemies() -> void:
+	# Signal to spawn new enemies (handled by level manager)
+	var level_manager = get_tree().get_first_node_in_group("level_manager")
+	if level_manager and level_manager.has_method("spawn_enemies"):
+		level_manager.spawn_enemies(global_position, 2)
+
 func _on_hit_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		if mask_manager and mask_manager.can_collide_with_enemy():
-			body.die()
+			body.take_damage(1)  # Contact damage
 
 # Communication system - alert nearby enemies
 func _alert_nearby_enemies() -> void:
@@ -284,3 +384,11 @@ func receive_alert(position: Vector2) -> void:
 		has_memory = true
 		memory_timer = memory_duration
 		alerted_by_ally = true
+
+func _animate_movement(delta: float) -> void:
+	# Subtle bobbing animation
+	if velocity.length() > 0:
+		var bob_amount := sin(Engine.get_process_frames() * 0.2) * 2.0
+		visual.position.y = bob_amount
+	else:
+		visual.position.y = lerp(visual.position.y, 0.0, delta * 5.0)

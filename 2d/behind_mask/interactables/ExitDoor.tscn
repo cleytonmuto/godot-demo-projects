@@ -3,11 +3,13 @@
 [ext_resource type="Script" path="res://interactables/ExitDoor.gd" id="1_door"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
-size = Vector2(40, 56)
+size = Vector2(60, 80)
 
 [node name="ExitDoor" type="Area2D"]
 collision_layer = 0
 collision_mask = 2
+monitoring = true
+monitorable = false
 script = ExtResource("1_door")
 
 [node name="Visual" type="Node2D" parent="."]
@@ -37,3 +39,4 @@ color = Color(0.7, 0.6, 0.2, 1)
 shape = SubResource("RectangleShape2D_door")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]

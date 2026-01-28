@@ -6,6 +6,9 @@ extends CanvasLayer
 @onready var detection_bar: ProgressBar = %DetectionBar
 @onready var stats_label: Label = %StatsLabel
 @onready var charges_container: HBoxContainer = %ChargesContainer
+@onready var health_bar: ProgressBar = %HealthBar
+@onready var score_label: Label = %ScoreLabel
+@onready var combo_label: Label = %ComboLabel
 
 var player: Node
 var mask_manager: Node
@@ -43,6 +46,19 @@ func _connect_to_player() -> void:
 		_on_mask_changed(mask_manager.current_mask)
 		_update_all_charges()
 		cooldown_bar.max_value = 3.0  # 3 seconds per mask
+		
+		# Connect health signal
+		if player.has_signal("health_changed"):
+			player.health_changed.connect(_on_health_changed)
+			# Initialize health bar
+			health_bar.max_value = player.max_health
+			health_bar.value = player.health
+		
+		# Connect score signals
+		ScoreManager.score_changed.connect(_on_score_changed)
+		ScoreManager.combo_changed.connect(_on_combo_changed)
+		_on_score_changed(ScoreManager.score)
+		_on_combo_changed(ScoreManager.combo)
 
 func _on_mask_changed(mask: int) -> void:
 	if not mask_manager:
@@ -120,3 +136,31 @@ func _update_charge_label(mask: int, charges: int) -> void:
 	else:
 		label.text = str(charges)
 		label.modulate = Color.WHITE
+
+func _on_health_changed(current: int, max_health: int) -> void:
+	health_bar.max_value = max_health
+	health_bar.value = current
+	
+	# Color based on health level
+	if current <= max_health * 0.3:
+		health_bar.modulate = Color(1, 0.2, 0.2)  # Red - critical
+	elif current <= max_health * 0.6:
+		health_bar.modulate = Color(1, 0.7, 0.2)  # Orange
+	else:
+		health_bar.modulate = Color(0.2, 0.8, 0.2)  # Green
+
+func _on_score_changed(new_score: int) -> void:
+	if score_label:
+		score_label.text = "Score: %d" % new_score
+
+func _on_combo_changed(new_combo: int) -> void:
+	if combo_label:
+		if new_combo > 0:
+			combo_label.text = "Combo: x%d" % new_combo
+			combo_label.visible = true
+			# Animate combo
+			var tween := create_tween()
+			tween.tween_property(combo_label, "scale", Vector2(1.3, 1.3), 0.1)
+			tween.tween_property(combo_label, "scale", Vector2(1.0, 1.0), 0.1)
+		else:
+			combo_label.visible = false

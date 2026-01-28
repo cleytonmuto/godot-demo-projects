@@ -2,6 +2,7 @@ extends Node
 
 var current_level_path: String = ""
 var is_restarting := false
+var camera: Camera2D = null
 
 func _ready() -> void:
 	# The main scene is loaded automatically, so we track it
@@ -13,6 +14,11 @@ func load_level(path: String) -> void:
 	# Start BGM if loading a gameplay level
 	if "level" in path:
 		AudioManager.play_bgm()
+		# Reset score after scene loads
+		await get_tree().process_frame
+		var score_mgr := get_node("/root/ScoreManager")
+		if score_mgr and score_mgr.has_method("reset"):
+			score_mgr.reset()
 
 func restart_level() -> void:
 	if is_restarting:
@@ -25,10 +31,19 @@ func restart_level() -> void:
 	# Screen shake before restart
 	await _do_screen_shake()
 	
-	if current_level_path != "":
-		get_tree().change_scene_to_file(current_level_path)
+	# Get the current scene path if not set
+	var level_path: String = current_level_path
+	if level_path == "":
+		var current_scene := get_tree().current_scene
+		if current_scene:
+			level_path = current_scene.scene_file_path
+			if level_path != "":
+				current_level_path = level_path
+	
+	if level_path != "":
+		get_tree().change_scene_to_file(level_path)
 	else:
-		# If no level is set, reload the current scene
+		# Fallback: reload the current scene
 		get_tree().reload_current_scene()
 	
 	is_restarting = false
@@ -68,3 +83,25 @@ func _do_screen_shake() -> void:
 		await get_tree().create_timer(0.25).timeout
 	
 	shake_layer.queue_free()
+
+func shake_camera(intensity: float = 0.1, duration: float = 0.2) -> void:
+	# Try to find camera
+	var scene := get_tree().current_scene
+	if not scene:
+		return
+	
+	var cam := scene.get_node_or_null("Camera2D")
+	if not cam:
+		return
+	
+	var original_offset: Vector2 = cam.offset
+	var tween := create_tween()
+	
+	for i in range(int(duration * 25)):
+		var offset: Vector2 = Vector2(
+			randf_range(-intensity * 10, intensity * 10),
+			randf_range(-intensity * 10, intensity * 10)
+		)
+		tween.tween_property(cam, "offset", original_offset + offset, 0.04)
+	
+	tween.tween_property(cam, "offset", original_offset, 0.1)

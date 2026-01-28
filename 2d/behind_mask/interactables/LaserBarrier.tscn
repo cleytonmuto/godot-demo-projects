@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://claser001"]
 
-[ext_resource type="Script" uid="uid://claser001" path="res://interactables/LaserBarrier.gd" id="1_laser"]
+[ext_resource type="Script" path="res://interactables/LaserBarrier.gd" id="1_laser"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_laser"]
 size = Vector2(16, 100)
