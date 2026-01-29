@@ -7,7 +7,7 @@ class_name BaseEnemy
 @export var patrol_distance := 64.0
 @export var detection_radius := 180.0
 @export var communication_radius := 250.0
-@export var max_health := 2
+@export var max_health := 20
 @export var health := 2
 @export var shoot_interval := 2.0
 @export var shoot_range := 400.0
@@ -409,7 +409,7 @@ func _die() -> void:
 		enemy_type = "mimic"
 	
 	ScoreManager.add_kill_score(enemy_type)
-	
+	ExperienceManager.add_exp(max_health)
 	# Slow-mo effect on kill
 	EffectManager.slow_mo(0.15, 0.4)
 	
@@ -429,7 +429,7 @@ func _spawn_new_enemies() -> void:
 func _on_hit_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		if mask_manager and mask_manager.can_collide_with_enemy():
-			body.take_damage(1)  # Contact damage
+			body.take_damage(10)  # Contact damage
 
 # Communication system - alert nearby enemies
 func _alert_nearby_enemies() -> void:

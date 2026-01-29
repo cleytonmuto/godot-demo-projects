@@ -3,7 +3,7 @@ class_name Sword
 
 ## Sword weapon with fast rotating arc and neon trail
 
-@export var damage := 1
+@export var damage := 10
 @export var swing_radius := 120.0
 @export var swing_duration := 0.3
 @export var arc_angle := PI / 3.0  # 60 degree arc

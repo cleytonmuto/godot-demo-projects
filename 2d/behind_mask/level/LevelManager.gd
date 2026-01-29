@@ -6,6 +6,14 @@ class_name LevelManager
 @export var enemy_scene: PackedScene
 @export var spawn_radius_min := 150.0
 @export var spawn_radius_max := 300.0
+## Level bounds for spawn validity. If 0, read from Camera2D on the level.
+@export var level_width := 2048.0
+@export var level_height := 768.0
+
+var _spawn_min_x := 50.0
+var _spawn_max_x := 1998.0
+var _spawn_min_y := 50.0
+var _spawn_max_y := 718.0
 
 func _ready() -> void:
 	add_to_group("level_manager")
@@ -13,6 +21,17 @@ func _ready() -> void:
 	# Load default enemy scene if not set
 	if not enemy_scene:
 		enemy_scene = preload("res://enemy/Enemy.tscn")
+	
+	# Resolve level bounds: use exports, or read from level's Camera2D
+	if level_width > 0 and level_height > 0:
+		_spawn_max_x = level_width - 50.0
+		_spawn_max_y = level_height - 50.0
+	else:
+		var root := get_tree().current_scene
+		var cam := root.get_node_or_null("Camera2D") as Camera2D
+		if cam and "level_width" in cam and "level_height" in cam:
+			_spawn_max_x = float(cam.get("level_width")) - 50.0
+			_spawn_max_y = float(cam.get("level_height")) - 50.0
 
 func spawn_enemies(position: Vector2, count: int) -> void:
 	# IMPORTANT: This can be called from within physics/collision callbacks.
@@ -64,8 +83,8 @@ func _find_spawn_position(origin: Vector2, avoid_pos: Vector2, max_attempts: int
 		if pos.distance_to(avoid_pos) < 100.0:
 			continue
 		
-		# Check if within level bounds (rough check)
-		if pos.x < 50 or pos.x > 974 or pos.y < 50 or pos.y > 718:
+		# Check if within level bounds (margin 50 from edges)
+		if pos.x < _spawn_min_x or pos.x > _spawn_max_x or pos.y < _spawn_min_y or pos.y > _spawn_max_y:
 			continue
 		
 		return pos

@@ -46,9 +46,6 @@ func _ready() -> void:
 		visible = true
 		if collision:
 			collision.disabled = false
-	
-	# Debug: Print door status
-	print("ExitDoor ready - next_level: ", next_level_path, ", position: ", global_position, ", monitoring: ", monitoring, ", collision disabled: ", collision.disabled if collision else "no collision")
 
 func _on_boss_defeated() -> void:
 	# Count remaining bosses
@@ -70,19 +67,13 @@ func _unlock_door() -> void:
 	AudioManager.play_level_complete()
 
 func _on_body_entered(body: Node2D) -> void:
-	print("ExitDoor: body entered - ", body.name, ", is_player: ", body.is_in_group("player"))
 	if body.is_in_group("player"):
 		player_inside = true
-		print("ExitDoor: Player entered - is_entering: ", is_entering, ", collision disabled: ", collision.disabled if collision else "no collision")
-		
 		# If the door requires a boss, ensure it has been defeated
 		if requires_boss and not boss_defeated:
-			print("ExitDoor: Door locked - boss not defeated yet")
 			return
-		
 		# Door is available
 		if not is_entering:
-			print("ExitDoor: Entering door")
 			_enter_door()
 
 func _process(_delta: float) -> void:
@@ -98,7 +89,6 @@ func _process(_delta: float) -> void:
 	if player and not player_inside:
 		var distance := global_position.distance_to(player.global_position)
 		if distance < 50.0:  # Within 50 pixels
-			print("ExitDoor: Player near door (fallback) - distance: ", distance)
 			if player.is_in_group("player"):
 				player_inside = true
 				_enter_door()
@@ -110,12 +100,8 @@ func _on_body_exited(body: Node2D) -> void:
 func _enter_door() -> void:
 	# Prevent multiple calls
 	if is_entering or not is_inside_tree():
-		print("ExitDoor: Already entering or not in tree")
 		return
-	
 	is_entering = true
-	print("ExitDoor: Loading level - ", next_level_path)
-	
 	# Small delay to ensure everything is ready
 	await get_tree().process_frame
 	

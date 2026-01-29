@@ -1,8 +1,8 @@
 extends CharacterBody2D
 
 @export var speed := 200.0
-@export var max_health := 5
-@export var health := 5
+@export var max_health := 50
+@export var health := 50
 
 signal health_changed(current: int, max_health: int)
 
@@ -23,6 +23,14 @@ var invulnerability_duration := 1.0
 var invulnerability_timer := 0.0
 
 func _ready() -> void:
+	# Apply stats from ExperienceManager (level-up bonuses)
+	var exp_mgr := get_node_or_null("/root/ExperienceManager")
+	if exp_mgr:
+		speed = exp_mgr.get_speed()
+		max_health = exp_mgr.get_max_health()
+		health = max_health
+		if sword:
+			sword.damage = exp_mgr.get_sword_damage()
 	mask_manager.mask_changed.connect(_on_mask_changed)
 	_apply_mask_color(mask_manager.get_mask_color())
 	health = max_health

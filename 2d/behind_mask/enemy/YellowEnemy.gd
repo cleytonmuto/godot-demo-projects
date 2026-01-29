@@ -5,7 +5,7 @@ class_name YellowEnemy
 
 func _ready() -> void:
 	super._ready()
-	max_health = 4
+	max_health = 40
 	health = 4
 	_apply_yellow_colors()
 

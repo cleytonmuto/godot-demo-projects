@@ -4,7 +4,7 @@ class_name EnemyBullet
 ## Bullet fired by enemies
 
 @export var speed := 300.0
-@export var damage := 1
+@export var damage := 10
 @export var lifetime := 3.0
 
 var direction := Vector2.ZERO

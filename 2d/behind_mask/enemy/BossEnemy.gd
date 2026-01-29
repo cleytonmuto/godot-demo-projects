@@ -3,7 +3,7 @@ class_name BossEnemy
 
 ## Boss Enemy - Larger, more health, must be destroyed for exit door to appear
 
-@export var boss_health := 10
+@export var boss_health := 100
 @export var boss_scale := 3.5
 
 signal boss_defeated
@@ -113,9 +113,8 @@ func take_damage(amount: int, hit_position: Vector2 = Vector2.ZERO) -> void:
 		_die()
 
 func _die() -> void:
-	# Add score
 	ScoreManager.add_kill_score("boss")
-	
+	ExperienceManager.add_exp(max_health)
 	# Emit signal before dying
 	boss_defeated.emit()
 	

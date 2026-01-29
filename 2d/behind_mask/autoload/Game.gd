@@ -14,7 +14,11 @@ func load_level(path: String) -> void:
 	# Start BGM if loading a gameplay level
 	if "level" in path:
 		AudioManager.play_bgm()
-		# Reset score after scene loads
+		# Reset score and EXP when starting from level 1 (new run)
+		if "level_01" in path:
+			var exp_mgr := get_node_or_null("/root/ExperienceManager")
+			if exp_mgr and exp_mgr.has_method("reset"):
+				exp_mgr.reset()
 		await get_tree().process_frame
 		var score_mgr := get_node("/root/ScoreManager")
 		if score_mgr and score_mgr.has_method("reset"):
