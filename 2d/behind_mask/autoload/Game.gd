@@ -2,7 +2,6 @@ extends Node
 
 var current_level_path: String = ""
 var is_restarting := false
-var camera: Camera2D = null
 
 func _ready() -> void:
 	# The main scene is loaded automatically, so we track it

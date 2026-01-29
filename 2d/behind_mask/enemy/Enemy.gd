@@ -8,7 +8,7 @@ class_name BaseEnemy
 @export var detection_radius := 180.0
 @export var communication_radius := 250.0
 @export var max_health := 20
-@export var health := 2
+@export var health := 20
 @export var shoot_interval := 2.0
 @export var shoot_range := 400.0
 @export var knockback_force := 1200.0

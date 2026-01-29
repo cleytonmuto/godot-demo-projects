@@ -6,7 +6,7 @@ class_name OrangeEnemy
 func _ready() -> void:
 	super._ready()
 	max_health = 30
-	health = 3
+	health = 30
 	_apply_orange_colors()
 
 func _apply_orange_colors() -> void:

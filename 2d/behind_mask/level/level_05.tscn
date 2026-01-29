@@ -364,17 +364,17 @@ color = Color(0.6, 0.4, 0.7, 1)
 position = Vector2(96, 704)
 
 # Mixed enemy types: more, with varied patrols
-[node name="Enemy1" parent="." instance=ExtResource("2_enemy")]
+[node name="Enemy1" parent="." instance=ExtResource("26_indigo")]
 position = Vector2(260, 520)
 patrol_distance = 120.0
 patrol_pattern = 3
 
-[node name="Enemy2" parent="." instance=ExtResource("2_enemy")]
+[node name="Enemy2" parent="." instance=ExtResource("26_indigo")]
 position = Vector2(512, 384)
 patrol_distance = 140.0
 patrol_pattern = 0
 
-[node name="Enemy3" parent="." instance=ExtResource("2_enemy")]
+[node name="Enemy3" parent="." instance=ExtResource("26_indigo")]
 position = Vector2(820, 520)
 patrol_distance = 120.0
 patrol_pattern = 1
@@ -489,6 +489,7 @@ requires_boss = false
 
 [node name="LevelManager" type="Node" parent="."]
 script = ExtResource("6_levelmgr")
+spawn_enemy_scene = ExtResource("26_indigo")
 
 [node name="BackgroundGenerator" type="Node2D" parent="."]
 script = ExtResource("5_bg")

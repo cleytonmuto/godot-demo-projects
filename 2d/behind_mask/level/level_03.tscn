@@ -452,6 +452,7 @@ position = Vector2(800, 400)
 
 [node name="LevelManager" type="Node" parent="."]
 script = ExtResource("6_levelmgr")
+spawn_enemy_scene = ExtResource("11_green")
 
 [node name="BackgroundGenerator" type="Node2D" parent="."]
 script = ExtResource("5_bg")

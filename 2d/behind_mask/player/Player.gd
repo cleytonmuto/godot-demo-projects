@@ -21,6 +21,7 @@ var is_animating := false
 var invulnerable := false
 var invulnerability_duration := 1.0
 var invulnerability_timer := 0.0
+var _last_dust_msec := 0  # Throttle dust particles (~12/s max)
 
 func _ready() -> void:
 	# Apply stats from ExperienceManager (level-up bonuses)
@@ -159,8 +160,10 @@ func _animate_movement(delta: float) -> void:
 		var bob_amount := sin(Engine.get_process_frames() * 0.15) * 1.5
 		visual.position.y = bob_amount
 		
-		# Create dust particles when moving
-		if randf() < 0.1:  # 10% chance per frame
+		# Create dust particles when moving (throttled to ~12/s)
+		var now_msec := Time.get_ticks_msec()
+		if now_msec - _last_dust_msec > 80:
+			_last_dust_msec = now_msec
 			ParticleManager.create_dust(global_position, -velocity.normalized())
 	else:
 		visual.position.y = lerp(visual.position.y, 0.0, delta * 5.0)

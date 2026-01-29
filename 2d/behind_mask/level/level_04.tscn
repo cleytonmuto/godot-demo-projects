@@ -384,11 +384,11 @@ position = Vector2(800, 550)
 patrol_distance = 60.0
 patrol_pattern = 1
 
-[node name="Enemy2" parent="." instance=ExtResource("2_enemy")]
+[node name="Enemy2" parent="." instance=ExtResource("25_blue")]
 position = Vector2(100, 300)
 patrol_distance = 80.0
 
-[node name="Enemy3" parent="." instance=ExtResource("2_enemy")]
+[node name="Enemy3" parent="." instance=ExtResource("25_blue")]
 position = Vector2(600, 100)
 patrol_distance = 100.0
 
@@ -456,6 +456,7 @@ requires_boss = false
 
 [node name="LevelManager" type="Node" parent="."]
 script = ExtResource("6_levelmgr")
+spawn_enemy_scene = ExtResource("25_blue")
 
 [node name="BackgroundGenerator" type="Node2D" parent="."]
 script = ExtResource("5_bg")

@@ -6,7 +6,7 @@ class_name VioletEnemy
 func _ready() -> void:
 	super._ready()
 	max_health = 80
-	health = 8
+	health = 80
 	_apply_violet_colors()
 
 func _apply_violet_colors() -> void:

@@ -1,9 +1,12 @@
 extends Node
 class_name LevelManager
 
-## Manages enemy spawning when enemies are killed
+## Manages enemy spawning when enemies are killed.
+## When an enemy dies, 2 enemies are respawned using spawn_enemy_scene (strongest for this stage) if set, else enemy_scene.
 
 @export var enemy_scene: PackedScene
+## Scene to use when respawning (e.g. strongest enemy for this level). If null, uses enemy_scene.
+@export var spawn_enemy_scene: PackedScene
 @export var spawn_radius_min := 150.0
 @export var spawn_radius_max := 300.0
 ## Level bounds for spawn validity. If 0, read from Camera2D on the level.
@@ -58,6 +61,9 @@ func _do_spawn_enemies(position: Vector2, count: int) -> void:
 	
 	# Calculate how many we can spawn
 	var can_spawn: int = min(count, MAX_ENEMIES - enemy_count)
+	var scene_to_use: PackedScene = spawn_enemy_scene if spawn_enemy_scene else enemy_scene
+	if not scene_to_use:
+		scene_to_use = preload("res://enemy/Enemy.tscn")
 	
 	for i in range(can_spawn):
 		# Find a valid spawn position
@@ -65,8 +71,8 @@ func _do_spawn_enemies(position: Vector2, count: int) -> void:
 		if spawn_pos == Vector2.ZERO:
 			continue
 		
-		# Spawn enemy (deferred: we are already outside the flush)
-		var enemy := enemy_scene.instantiate()
+		# Spawn enemy (deferred: we are already outside the flush) — use strongest for this stage
+		var enemy := scene_to_use.instantiate()
 		if not enemy:
 			continue
 		

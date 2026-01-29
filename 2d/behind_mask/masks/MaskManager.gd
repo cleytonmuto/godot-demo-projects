@@ -186,11 +186,6 @@ func add_detection(amount: float) -> void:
 	
 	is_being_detected = false
 
-func cycle_mask() -> void:
-	# Manual mask switching is disabled - masks rotate automatically
-	# This function is kept for compatibility but does nothing
-	pass
-
 func _clear_decoy() -> void:
 	has_active_decoy = false
 

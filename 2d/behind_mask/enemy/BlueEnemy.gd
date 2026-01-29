@@ -6,7 +6,7 @@ class_name BlueEnemy
 func _ready() -> void:
 	super._ready()
 	max_health = 60
-	health = 6
+	health = 60
 	_apply_blue_colors()
 
 func _apply_blue_colors() -> void:

@@ -6,7 +6,7 @@ class_name IndigoEnemy
 func _ready() -> void:
 	super._ready()
 	max_health = 70
-	health = 7
+	health = 70
 	_apply_indigo_colors()
 
 func _apply_indigo_colors() -> void:

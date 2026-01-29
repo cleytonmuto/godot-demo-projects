@@ -12,6 +12,8 @@ var is_detecting_guard := false
 
 func _ready() -> void:
 	super._ready()
+	max_health = 200
+	health = 200
 	# Dark green color for hunter
 	$Visual/Body.color = Color(0.2, 0.5, 0.2, 1)
 

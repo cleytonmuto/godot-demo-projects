@@ -11,6 +11,8 @@ var base_color := Color(0.5, 0.5, 0.5)
 
 func _ready() -> void:
 	super._ready()
+	max_health = 200
+	health = 200
 	base_color = Color(0.5, 0.5, 0.5)
 	$Visual/Body.color = base_color
 

@@ -393,6 +393,7 @@ next_level_path = "res://level/level_02.tscn"
 
 [node name="LevelManager" type="Node" parent="."]
 script = ExtResource("6_levelmgr")
+spawn_enemy_scene = ExtResource("9_orange")
 
 [node name="BackgroundGenerator" type="Node2D" parent="."]
 script = ExtResource("5_bg")

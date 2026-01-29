@@ -7,6 +7,8 @@ class_name DetectorEnemy
 
 func _ready() -> void:
 	super._ready()
+	max_health = 200
+	health = 200
 	# Purple color for detector
 	$Visual/Body.color = Color(0.6, 0.2, 0.8, 1)
 
