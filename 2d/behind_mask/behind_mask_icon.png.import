@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dkerp0bmqkny7"
-path="res://.godot/imported/icon.webp-e94f9a68b0f625a567a797079e4d325f.ctex"
+uid="uid://bb45666siflrm"
+path="res://.godot/imported/behind_mask_icon.png-5e200a5f32813eac33ab2bc74caf300c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://icon.webp"
-dest_files=["res://.godot/imported/icon.webp-e94f9a68b0f625a567a797079e4d325f.ctex"]
+source_file="res://behind_mask_icon.png"
+dest_files=["res://.godot/imported/behind_mask_icon.png-5e200a5f32813eac33ab2bc74caf300c.ctex"]
 
 [params]
 

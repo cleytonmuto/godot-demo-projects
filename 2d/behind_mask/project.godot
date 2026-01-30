@@ -16,7 +16,7 @@ Global Game Jam 2026 - Theme: Mask"
 config/tags=PackedStringArray("2d", "demo", "puzzle", "official")
 run/main_scene="res://main.tscn"
 config/features=PackedStringArray("4.5")
-config/icon="res://icon.webp"
+config/icon="uid://bb45666siflrm"
 
 [autoload]
 
