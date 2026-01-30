@@ -21,6 +21,8 @@ Navigate through rooms filled with patrolling enemies and laser barriers by swit
 
 **Note**: Masks automatically rotate every 3 seconds. Plan your movement accordingly!
 
+On the **Game Over** screen: **Space** = restart from Level 1 (keep EXP/level/attributes), **Escape** = return to main menu.
+
 ## The Masks
 
 | Mask         | Color  | Cooldown | Charges | Effect                                 |
@@ -47,8 +49,9 @@ The camera follows the player; the level scrolls and clamps at edges.
 3. Reach the green exit door (boss levels require defeating the boss first)
 4. Navigate through laser barriers
 5. Masks automatically rotate every 3 seconds—time your movement and attacks
-6. If an enemy touches you (unless you're a Ghost), you take damage; zero health restarts the level
-7. Watch the cooldown bar to see when the next mask will activate
+6. If an enemy touches you (unless you're a Ghost) or you're hit by enemy bullets, you take damage; zero health shows the **Game Over** screen
+7. From Game Over you can restart from Level 1 (keeping EXP, level, and attributes) or return to the main menu
+8. Watch the cooldown bar to see when the next mask will activate
 
 ## Tips
 
@@ -67,6 +70,7 @@ The camera follows the player; the level scrolls and clamps at edges.
 - **Memory System**: Enemies remember your last position and investigate
 - **Patrol Patterns**: Horizontal, vertical, circular, or random patrol routes
 - **Communication**: Enemies alert nearby allies when they spot you
+- **Enemy bullets**: Enemies can shoot at you when in range; use masks and movement to avoid damage
 
 ### Enemy Types
 
@@ -83,6 +87,10 @@ The camera follows the player; the level scrolls and clamps at edges.
 - **Security Cameras**: Sweeping cameras that fill your detection meter (Ghost avoids)
 - **Pressure Plates**: Trigger mechanisms (Ghost can't activate - too ethereal)
 - **One-Way Doors**: Commit to your path, no backtracking
+
+### Pickups
+
+- **Life Potion**: Restores 20% of your max health. Has a chance to drop when enemies are defeated; collect by walking over it.
 
 ### Resource Management
 
@@ -131,7 +139,8 @@ behind_mask/
 │   └── EffectManager.gd     # Slow-mo, screen shake, etc.
 ├── art/
 │   ├── PixelArtGenerator.gd # Pixel-art style helpers
-│   └── particles/           # GPU particle scenes (HitSparks, Explosion, Dust) + textures
+│   ├── particles/           # GPU particle scenes (HitSparks, Explosion, Dust) + textures
+│   └── rounded_corners.gdshader # Shader for rounded UI/visuals
 ├── enemy/
 │   ├── Enemy.gd            # Base enemy AI (patrol/alert/chase/flee)
 │   ├── Enemy.tscn          # Base enemy scene
@@ -148,7 +157,8 @@ behind_mask/
 │   ├── PatrollingLaser.gd  # Moving lasers
 │   ├── SecurityCamera.gd   # Ghost avoids detection
 │   ├── PressurePlate.gd    # Ghost can't trigger
-│   └── OneWayDoor.gd       # One-way doors
+│   ├── OneWayDoor.gd       # One-way doors
+│   └── LifePotion.gd/.tscn # Health pickup (drops from enemies)
 ├── level/
 │   ├── level_01.tscn .. level_06.tscn  # Six levels (boss on 3, double boss on 6)
 │   ├── LevelCamera.gd       # Player-centered scrolling, clamp at edges
@@ -166,10 +176,12 @@ behind_mask/
 ├── ui/
 │   ├── HUD.gd              # Mask icons, cooldown, EXP bar, level, health, score, boss bars
 │   ├── HUD.tscn            # HUD layout
-│   ├── PauseOverlay.gd     # Pause menu, spend attribute points, debug code
+│   ├── PauseOverlay.gd     # Pause menu, spend attribute points
 │   ├── DamageNumber.gd     # Floating damage numbers
-│   ├── win_screen.gd       # Victory screen
-│   └── win_screen.tscn
+│   ├── win_screen.gd/.tscn # Victory screen
+│   └── lose_screen.gd/.tscn # Game Over screen (restart from L1 or main menu)
+├── docs/
+│   └── PARTICLES_ANALYSIS.md # Notes on GPU particles (2d/particles demo integration)
 ├── main.gd                 # Title screen logic
 ├── main.tscn               # Title screen
 └── project.godot           # Project configuration
