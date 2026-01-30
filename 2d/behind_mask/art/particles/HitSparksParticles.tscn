@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://bhitpart"]
+
+[ext_resource type="Texture2D" path="res://art/particles/spark_particle2.png" id="1_spark"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_spark"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 1, 0.9, 1, 1, 0.8, 0.3, 0.8, 1, 0.9, 0.5, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_spark"]
+gradient = SubResource("Gradient_spark")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_spark"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 6.0
+direction = Vector3(0, -1, 0)
+spread = 180.0
+initial_velocity_min = 80.0
+initial_velocity_max = 200.0
+gravity = Vector3(0, 200, 0)
+scale_min = 0.3
+scale_max = 0.8
+color_ramp = SubResource("GradientTexture1D_spark")
+
+[node name="HitSparksParticles" type="GPUParticles2D"]
+material = SubResource("CanvasItemMaterial_add")
+amount = 20
+lifetime = 0.35
+one_shot = true
+explosiveness = 1.0
+texture = ExtResource("1_spark")
+process_material = SubResource("ParticleProcessMaterial_spark")

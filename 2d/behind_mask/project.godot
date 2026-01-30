@@ -37,6 +37,10 @@ window/size/viewport_width=1024
 window/size/viewport_height=768
 window/stretch/mode="canvas_items"
 
+[editor]
+
+movie_writer/movie_file="C:/Users/RAYRA/Videos/Captures/output5.avi"
+
 [input]
 
 ui_up={

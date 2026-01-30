@@ -104,7 +104,7 @@ The camera follows the player; the level scrolls and clamps at edges.
 ### Juice
 
 - **Screen Shake**: Feedback on hits and death (Game, EffectManager)
-- **Particles**: Hit sparks, explosions, death effects (ParticleManager)
+- **Particles**: Hit sparks, explosions, dust (ParticleManager). Uses GPU particle scenes with textures and additive blending (inspired by the 2d/particles demo); falls back to CPU particles if scenes are missing.
 - **Slow-mo**: Brief slow-motion on boss kill (EffectManager)
 - **Mask Switch Animation**: Flash and scale pop
 - **Procedural Audio**: All SFX and BGM generated in real-time (AudioManager)
@@ -130,7 +130,8 @@ behind_mask/
 │   ├── ScoreManager.gd      # Kill score, combo tracking
 │   └── EffectManager.gd     # Slow-mo, screen shake, etc.
 ├── art/
-│   └── PixelArtGenerator.gd # Pixel-art style helpers
+│   ├── PixelArtGenerator.gd # Pixel-art style helpers
+│   └── particles/           # GPU particle scenes (HitSparks, Explosion, Dust) + textures
 ├── enemy/
 │   ├── Enemy.gd            # Base enemy AI (patrol/alert/chase/flee)
 │   ├── Enemy.tscn          # Base enemy scene

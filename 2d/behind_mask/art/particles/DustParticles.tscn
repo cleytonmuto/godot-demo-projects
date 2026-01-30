@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://bdustpart"]
+
+[ext_resource type="Texture2D" path="res://art/particles/smoke_particle.png" id="1_smoke"]
+
+[sub_resource type="Gradient" id="Gradient_dust"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.6, 0.5, 0.4, 0, 0.55, 0.45, 0.35, 0.5, 0.5, 0.4, 0.3, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_dust"]
+gradient = SubResource("Gradient_dust")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dust"]
+particle_flag_disable_z = true
+emission_shape = 1
+emission_sphere_radius = 4.0
+direction = Vector3(0, -1, 0)
+spread = 180.0
+initial_velocity_min = 15.0
+initial_velocity_max = 55.0
+gravity = Vector3(0, 30, 0)
+scale_min = 0.25
+scale_max = 0.7
+color_ramp = SubResource("GradientTexture1D_dust")
+
+[node name="DustParticles" type="GPUParticles2D"]
+amount = 10
+lifetime = 1.0
+one_shot = true
+explosiveness = 0.3
+texture = ExtResource("1_smoke")
+process_material = SubResource("ParticleProcessMaterial_dust")
