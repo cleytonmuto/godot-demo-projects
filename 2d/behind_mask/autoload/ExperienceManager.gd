@@ -7,11 +7,15 @@ signal exp_changed(current_exp: int, exp_to_next: int, level: int)
 signal level_up(new_level: int)
 signal stats_changed()
 
-const MAX_LEVEL := 10
+const MAX_LEVEL := 30
 const MAX_BONUS_PER_STAT := 10
 
-# Cumulative EXP required to reach level 2, 3, ... 10 (index 0 = level 2, index 8 = level 10) — 5× curve
-const EXP_REQUIRED: Array[int] = [400, 1000, 1800, 2800, 4000, 5400, 7000, 8800, 10800]
+# Cumulative EXP required to reach level 2, 3, ... 30 (index i = total EXP to reach level i+2). Curve: segment k adds 400 + 200*(k-1).
+const EXP_REQUIRED: Array[int] = [
+	400, 1000, 1800, 2800, 4000, 5400, 7000, 8800, 10800,
+	13000, 15400, 18000, 20800, 23800, 27000, 30400, 34000, 37800, 41800,
+	46000, 50400, 55000, 59800, 64800, 70000, 75400, 81000, 86800, 92800
+]
 
 # Base stats (before bonuses)
 const BASE_SWORD_DAMAGE := 10

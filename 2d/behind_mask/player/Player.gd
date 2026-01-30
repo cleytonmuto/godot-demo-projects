@@ -29,12 +29,16 @@ func _ready() -> void:
 	if exp_mgr:
 		speed = exp_mgr.get_speed()
 		max_health = exp_mgr.get_max_health()
-		health = max_health
 		if sword:
 			sword.damage = exp_mgr.get_sword_damage()
 	mask_manager.mask_changed.connect(_on_mask_changed)
 	_apply_mask_color(mask_manager.get_mask_color())
-	health = max_health
+	# Keep health between stages; only full health on new game (level_01)
+	if Game.stored_player_health >= 0:
+		health = mini(Game.stored_player_health, max_health)
+		Game.stored_player_health = -1
+	else:
+		health = max_health
 	health_changed.emit(health, max_health)
 	
 	# Connect to bullet hits
@@ -49,6 +53,17 @@ func _ready() -> void:
 	hit_area.add_child(hit_shape)
 	add_child(hit_area)
 	hit_area.body_entered.connect(_on_bullet_hit)
+	_apply_rounded_corners(visual)
+
+func _apply_rounded_corners(node: Node) -> void:
+	var shader := load("res://art/rounded_corners.gdshader") as Shader
+	for child in node.get_children():
+		if child is ColorRect:
+			var mat := ShaderMaterial.new()
+			mat.shader = shader
+			child.material = mat
+		else:
+			_apply_rounded_corners(child)
 
 func _physics_process(delta: float) -> void:
 	var input_vector := Vector2(
@@ -135,6 +150,10 @@ func take_damage(amount: int) -> void:
 	# Invulnerability period
 	invulnerable = true
 	invulnerability_timer = invulnerability_duration
+
+func heal(amount: int) -> void:
+	health = mini(health + amount, max_health)
+	health_changed.emit(health, max_health)
 	
 	# Visual feedback
 	var shake_tween := create_tween()
@@ -169,4 +188,4 @@ func _animate_movement(delta: float) -> void:
 		visual.position.y = lerp(visual.position.y, 0.0, delta * 5.0)
 
 func die() -> void:
-	Game.restart_level()
+	Game.show_game_over()

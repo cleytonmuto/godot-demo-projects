@@ -61,6 +61,7 @@ func _ready() -> void:
 	alert_indicator.visible = false
 	add_to_group("enemies")
 	health = max_health
+	_apply_rounded_corners(visual)
 	
 	# Load bullet scene
 	bullet_scene = preload("res://enemy/EnemyBullet.tscn")
@@ -68,6 +69,16 @@ func _ready() -> void:
 	# Wait a frame to ensure player is ready
 	await get_tree().process_frame
 	_connect_to_player()
+
+func _apply_rounded_corners(node: Node) -> void:
+	var shader := load("res://art/rounded_corners.gdshader") as Shader
+	for child in node.get_children():
+		if child is ColorRect:
+			var mat := ShaderMaterial.new()
+			mat.shader = shader
+			child.material = mat
+		else:
+			_apply_rounded_corners(child)
 
 func _draw_detection_circle() -> void:
 	var points := PackedVector2Array()
@@ -398,6 +409,9 @@ func take_damage(amount: int, hit_position: Vector2 = Vector2.ZERO) -> void:
 	if health <= 0:
 		_die()
 
+const LIFE_POTION_DROP_CHANCE := 0.10
+const LIFE_POTION_SCENE: PackedScene = preload("res://interactables/LifePotion.tscn")
+
 func _die() -> void:
 	# Add score
 	var enemy_type := "normal"
@@ -416,12 +430,29 @@ func _die() -> void:
 	# Explosion effect
 	ParticleManager.create_explosion(global_position, 1.0, Color(1, 0.3, 0.1))
 	
+	# 10% chance to drop a life potion
+	if randf() < LIFE_POTION_DROP_CHANCE:
+		_spawn_life_potion()
+	
 	# Spawn new enemies before dying
 	_spawn_new_enemies()
 	queue_free()
 
+func _spawn_life_potion() -> void:
+	var scene := get_tree().current_scene
+	if not scene:
+		return
+	var potion: Node2D = LIFE_POTION_SCENE.instantiate() as Node2D
+	if not potion:
+		return
+	scene.add_child(potion)
+	potion.global_position = global_position
+	ParticleManager.create_heal_drop(global_position)
+
 func _spawn_new_enemies() -> void:
-	# Signal to spawn new enemies (handled by level manager)
+	# Only spawn new enemies if doubleRespawn(true) was set in pause debug; default is false (no respawn)
+	if not Game.double_respawn:
+		return
 	var level_manager = get_tree().get_first_node_in_group("level_manager")
 	if level_manager and level_manager.has_method("spawn_enemies"):
 		level_manager.spawn_enemies(global_position, 2)

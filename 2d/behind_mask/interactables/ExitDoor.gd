@@ -105,6 +105,11 @@ func _enter_door() -> void:
 	# Small delay to ensure everything is ready
 	await get_tree().process_frame
 	
+	# Persist player health so next stage doesn't refill
+	var player := get_tree().get_first_node_in_group("player")
+	if player and "health" in player:
+		Game.stored_player_health = player.health
+	
 	if next_level_path != "":
 		Game.load_level(next_level_path)
 	else:

@@ -2,26 +2,39 @@ extends Node
 
 var current_level_path: String = ""
 var is_restarting := false
+## When true, defeating an enemy spawns 2 new enemies. When false (default), no respawn — makes leveling harder.
+var double_respawn := false
+## Health to restore when loading next stage (-1 = use full health, e.g. new game).
+var stored_player_health := -1
 
 func _ready() -> void:
 	# The main scene is loaded automatically, so we track it
 	pass
 
-func load_level(path: String) -> void:
+func load_level(path: String, keep_progress: bool = false) -> void:
 	current_level_path = path
 	get_tree().change_scene_to_file(path)
 	# Start BGM if loading a gameplay level
 	if "level" in path:
 		AudioManager.play_bgm()
-		# Reset score and EXP when starting from level 1 (new run)
+		# Every stage starts with no respawn (defeated enemies do not spawn more)
+		double_respawn = false
+		# New game (level 01): full health; reset EXP/score unless keep_progress (e.g. restart after death)
 		if "level_01" in path:
-			var exp_mgr := get_node_or_null("/root/ExperienceManager")
-			if exp_mgr and exp_mgr.has_method("reset"):
-				exp_mgr.reset()
+			stored_player_health = -1
+			if not keep_progress:
+				var exp_mgr := get_node_or_null("/root/ExperienceManager")
+				if exp_mgr and exp_mgr.has_method("reset"):
+					exp_mgr.reset()
 		await get_tree().process_frame
-		var score_mgr := get_node("/root/ScoreManager")
-		if score_mgr and score_mgr.has_method("reset"):
-			score_mgr.reset()
+		if not keep_progress:
+			var score_mgr := get_node("/root/ScoreManager")
+			if score_mgr and score_mgr.has_method("reset"):
+				score_mgr.reset()
+
+func show_game_over() -> void:
+	AudioManager.play_death()
+	get_tree().change_scene_to_file("res://ui/lose_screen.tscn")
 
 func restart_level() -> void:
 	if is_restarting:

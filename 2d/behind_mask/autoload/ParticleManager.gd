@@ -118,3 +118,55 @@ static func create_dust(position: Vector2, direction: Vector2 = Vector2.ZERO) ->
 	cpu.scale_amount_max = 1.5
 	scene.add_child(cpu)
 	cpu.finished.connect(func(): cpu.queue_free())
+
+static func create_heal_burst(position: Vector2) -> void:
+	## Green upward burst when player picks up a life potion.
+	if not instance:
+		return
+	var scene: Node = Engine.get_main_loop().current_scene
+	if not scene:
+		return
+	var cpu := CPUParticles2D.new()
+	cpu.position = position
+	cpu.emitting = true
+	cpu.one_shot = true
+	cpu.amount = 24
+	cpu.lifetime = 0.5
+	cpu.emission_shape = 1
+	cpu.emission_sphere_radius = 8.0
+	cpu.direction = Vector2(0, -1)
+	cpu.spread = 90.0
+	cpu.initial_velocity_min = 80.0
+	cpu.initial_velocity_max = 180.0
+	cpu.gravity = Vector2(0, -60)
+	cpu.color = Color(0.3, 1.0, 0.5, 0.9)
+	cpu.scale_amount_min = 1.2
+	cpu.scale_amount_max = 2.0
+	scene.add_child(cpu)
+	cpu.finished.connect(func(): cpu.queue_free())
+
+static func create_heal_drop(position: Vector2) -> void:
+	## Small green sparkles when a life potion drops from an enemy.
+	if not instance:
+		return
+	var scene: Node = Engine.get_main_loop().current_scene
+	if not scene:
+		return
+	var cpu := CPUParticles2D.new()
+	cpu.position = position
+	cpu.emitting = true
+	cpu.one_shot = true
+	cpu.amount = 12
+	cpu.lifetime = 0.4
+	cpu.emission_shape = 1
+	cpu.emission_sphere_radius = 6.0
+	cpu.direction = Vector2(0, -1)
+	cpu.spread = 180.0
+	cpu.initial_velocity_min = 20.0
+	cpu.initial_velocity_max = 60.0
+	cpu.gravity = Vector2(0, 40)
+	cpu.color = Color(0.4, 1.0, 0.6, 0.8)
+	cpu.scale_amount_min = 0.6
+	cpu.scale_amount_max = 1.2
+	scene.add_child(cpu)
+	cpu.finished.connect(func(): cpu.queue_free())

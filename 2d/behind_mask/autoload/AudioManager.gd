@@ -100,6 +100,12 @@ func play_cooldown_ready() -> void:
 	player.pitch_scale = 1.0
 	player.play()
 
+func play_potion_pickup() -> void:
+	var player := _get_available_sfx_player()
+	player.stream = _generate_potion_pickup_sound()
+	player.pitch_scale = randf_range(0.95, 1.05)
+	player.play()
+
 func play_sword_swing() -> void:
 	var player := _get_available_sfx_player()
 	player.stream = _generate_sword_sound()
@@ -376,6 +382,28 @@ func _generate_ready_sound() -> AudioStreamWAV:
 		data[i * 2] = sample_int & 0xFF
 		data[i * 2 + 1] = (sample_int >> 8) & 0xFF
 	
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = sample_rate
+	stream.data = data
+	return stream
+
+func _generate_potion_pickup_sound() -> AudioStreamWAV:
+	# Short pleasant "ding" when picking up a life potion
+	var sample_rate := 22050
+	var duration := 0.15
+	var num_samples := int(duration * sample_rate)
+	var data := PackedByteArray()
+	data.resize(num_samples * 2)
+	for i in range(num_samples):
+		var t := float(i) / sample_rate
+		var progress := t / duration
+		var envelope := (1.0 - progress) * (1.0 - progress)
+		var freq := 880.0 + progress * 440.0
+		var sample := sin(t * freq * TAU) * envelope * 0.35
+		var sample_int := int(clamp(sample * 32767, -32768, 32767))
+		data[i * 2] = sample_int & 0xFF
+		data[i * 2 + 1] = (sample_int >> 8) & 0xFF
 	var stream := AudioStreamWAV.new()
 	stream.format = AudioStreamWAV.FORMAT_16_BITS
 	stream.mix_rate = sample_rate

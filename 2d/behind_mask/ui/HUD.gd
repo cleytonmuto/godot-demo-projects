@@ -202,6 +202,15 @@ func _run_command(raw: String) -> void:
 			pause_overlay.visible = false
 			Game.load_level("res://level/level_%02d.tscn" % n)
 			return
+	# doubleRespawn(true) = defeated enemies respawn 2; doubleRespawn(false) = no respawn (default)
+	var respawn_regex := RegEx.new()
+	respawn_regex.compile("doublerespawn\\s*\\(\\s*(true|false)\\s*\\)")
+	var respawn_match := respawn_regex.search(text)
+	if respawn_match:
+		var value_str: String = respawn_match.get_string(1)
+		Game.double_respawn = (value_str == "true")
+		pause_command_invalid_label.visible = false
+		return
 	pause_command_invalid_label.visible = true
 
 func _hide_command_panel() -> void:
@@ -291,6 +300,7 @@ func _connect_to_player() -> void:
 			if i == 0:
 				boss_row.visible = true
 				boss_health_label.text = "Boss 1:"
+				boss_health_label.justification_flags = TextServer.JUSTIFICATION_NONE
 				boss_health_bar.visible = true
 				boss_health_bar.max_value = boss.get("boss_health")
 				boss_health_bar.value = boss.get("boss_health")
@@ -302,6 +312,7 @@ func _connect_to_player() -> void:
 				row.add_theme_constant_override("separation", 8)
 				var l := Label.new()
 				l.text = "Boss " + str(i + 1) + ":"
+				l.justification_flags = TextServer.JUSTIFICATION_NONE
 				l.add_theme_font_size_override("font_size", 12)
 				l.add_theme_color_override("font_color", Color(0.9, 0.3, 1, 1))
 				row.add_child(l)

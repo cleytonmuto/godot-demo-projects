@@ -30,30 +30,16 @@ func _ready() -> void:
 	# Change boss to distinct purple/magenta color scheme
 	_apply_boss_colors()
 	
-	# Enhanced visual - add boss indicator (positioned higher for larger boss)
-	var boss_label := Label.new()
-	boss_label.name = "BossLabel"
-	boss_label.text = "BOSS"
-	boss_label.position = Vector2(-50, -140)
-	boss_label.add_theme_color_override("font_color", Color(0.9, 0.3, 1.0))
-	boss_label.add_theme_font_size_override("font_size", 40)
-	boss_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(boss_label)
-	
-	# Health bar above boss (larger for bigger boss)
-	var health_bar_bg := ColorRect.new()
-	health_bar_bg.name = "HealthBarBG"
-	health_bar_bg.position = Vector2(-60, -120)
-	health_bar_bg.size = Vector2(120, 12)
-	health_bar_bg.color = Color(0.2, 0.2, 0.2)
-	add_child(health_bar_bg)
-	
-	var health_bar := ColorRect.new()
-	health_bar.name = "HealthBar"
-	health_bar.position = Vector2(-60, -120)
-	health_bar.size = Vector2(120, 12)
-	health_bar.color = Color(0.8, 0.2, 1.0)
-	health_bar_bg.add_child(health_bar)
+func _draw() -> void:
+	# Boss name above head (drawn to avoid Label strikethrough)
+	var font := ThemeDB.fallback_font
+	const FONT_SIZE := 40
+	const BOSS_COLOR := Color(0.9, 0.3, 1.0)
+	var text := "BOSS"
+	var size := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, TextServer.JUSTIFICATION_NONE)
+	var ascent := font.get_ascent(FONT_SIZE)
+	var pos := Vector2(-size.x / 2.0, -140.0 + ascent)
+	font.draw_string(get_canvas_item(), pos, text, HORIZONTAL_ALIGNMENT_LEFT, -1, FONT_SIZE, BOSS_COLOR, TextServer.JUSTIFICATION_NONE)
 
 func take_damage(amount: int, hit_position: Vector2 = Vector2.ZERO) -> void:
 	# Boss gets knockback too
@@ -88,13 +74,6 @@ func take_damage(amount: int, hit_position: Vector2 = Vector2.ZERO) -> void:
 	# Notify HUD about boss health change
 	boss_health_changed.emit(health, max_health)
 	
-	# Update health bar
-	var health_bar := get_node_or_null("HealthBarBG/HealthBar")
-	if health_bar:
-		var health_percent := float(health) / float(max_health)
-		health_bar.size.x = 120.0 * health_percent
-		health_bar.color = Color(lerp(0.3, 0.8, health_percent), lerp(0.1, 0.2, health_percent), lerp(0.5, 1.0, health_percent))
-	
 	# Visual feedback
 	var flash_tween := create_tween()
 	flash_tween.tween_property(visual, "modulate", Color(2, 0.5, 0.5, 1), 0.1)
@@ -121,6 +100,10 @@ func _die() -> void:
 	# Don't spawn regular enemies for boss
 	# Create explosion effect
 	_create_death_explosion()
+	
+	# 10% chance to drop a life potion (uses BaseEnemy.LIFE_POTION_* and _spawn_life_potion)
+	if randf() < LIFE_POTION_DROP_CHANCE:
+		_spawn_life_potion()
 	
 	# Slow-mo on boss kill
 	EffectManager.slow_mo(0.3, 0.2)
